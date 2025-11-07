@@ -4,7 +4,7 @@
 
 # VCompress
 
-A powerful Android video compression application built with Flutter. VCompressor provides intelligent video optimization with hardware acceleration, batch processing, and real-time progress tracking.
+A powerful Android video compression application built with Flutter. VCompress provides intelligent video optimization with hardware acceleration, batch processing, and real-time progress tracking.
 
 **Platforms**: Android (7.0+)
 
