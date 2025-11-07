@@ -43,6 +43,27 @@ Una poderosa aplicación Android de compresión de videos construida con Flutter
 
 ---
 
+## Vista Previa de la Interfaz de Usuario
+
+### Flujo de Compresión
+
+VCompress presenta una interfaz intuitiva en Material Design 3 que guía a los usuarios a través del proceso de compresión de video:
+
+| **Paso 1: Importar** | **Paso 2: Configurar** | **Paso 3: Procesar** | **Paso 4: Resultados** |
+|:---:|:---:|:---:|:---:|
+| Busca y selecciona videos de tu dispositivo | Configura ajustes de compresión (algoritmo, resolución, formato) | Monitorea el progreso de compresión en tiempo real | Ve videos comprimidos y exporta |
+| ![Inicio](docs/mockups/home_page_withvideo.png) | ![Modal de Config](docs/mockups/videoconfigmodal.png) | ![Comprimiendo](docs/mockups/process_page_video_compressing.png) | ![Resultados](docs/mockups/process_Page_result_videocompressed.png) |
+
+### Características Avanzadas
+
+**Configuración Fina** - Expande el modal de configuración para control granular sobre parámetros de compresión
+![Modal Expandido](docs/mockups/videoconfigmodal_expanded.png)
+
+**Reproducción Nativa** - Visualiza videos comprimidos usando el reproductor multimedia nativo de tu dispositivo
+![Reproducción](docs/mockups/video_player_watching_result.png)
+
+---
+
 ## Especificaciones Técnicas
 
 ### Requisitos del Sistema

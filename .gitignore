@@ -42,7 +42,6 @@ app.*.map.json
 .claude/
 .claude-context.db
 test_videos/
-/docs/
 
 # Configuration files
 CLAUDE.md
