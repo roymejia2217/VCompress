@@ -17,6 +17,28 @@ A powerful Android video compression application built with Flutter. VCompress p
 
 ---
 
+## Table of Contents
+
+- [Features](#features)
+- [User Interface Preview](#user-interface-preview)
+- [Technical Specifications](#technical-specifications)
+- [Architecture](#architecture)
+- [Installation & Setup](#installation--setup)
+- [Usage](#usage)
+- [Development](#development)
+- [Testing](#testing)
+- [Performance Optimizations](#performance-optimizations)
+- [Compatibility](#compatibility)
+- [Troubleshooting](#troubleshooting)
+- [Dependency Management](#dependency-management)
+- [Architecture Decisions](#architecture-decisions)
+- [Contributing](#contributing)
+- [FAQ](#faq)
+- [License](#license)
+- [Support](#support)
+
+---
+
 ## Features
 
 ### Core Compression
@@ -627,6 +649,54 @@ Contributions welcome! Please:
 - [ ] More language translations
 - [ ] Performance benchmarks
 - [ ] Accessibility improvements
+
+---
+
+## FAQ
+
+**Q: How long does video compression typically take?**
+
+Compression time depends on video size, resolution, target codec, and device hardware. A 100MB video may take 2-5 minutes on a mid-range device. Hardware acceleration (H.264/H.265 with MediaCodec) significantly reduces processing time.
+
+**Q: What is the difference between the compression algorithms (VP8, VP9, H.264, H.265)?**
+
+H.265 provides best compression ratio but slower encoding. H.264 balances compression and speed. VP9 offers web optimization. VP8 is older, rarely used. Choose H.265 for maximum size reduction, H.264 for compatibility and speed.
+
+**Q: Will the original video file be deleted after compression?**
+
+No. VCompress saves the compressed video to a new file. Your original remains untouched. You can enable overwrite in Settings if desired.
+
+**Q: Why does my device get hot during compression?**
+
+Video compression is CPU/GPU intensive. On older devices, sustained processing generates heat. This is normal. Reduce target resolution or split large videos into segments to minimize heat generation.
+
+**Q: What permissions does VCompress need and why?**
+
+Storage: Read/write video files. Notifications: Show compression progress. Camera/Microphone: Not required; app doesn't use them. Permissions requested only as needed.
+
+**Q: Can I compress videos in background or while using other apps?**
+
+Yes. VCompress runs compression as a background service. You can navigate away, use other apps, or lock the device. Progress notifications keep you updated.
+
+**Q: Which video formats are supported as input?**
+
+Any format supported by FFmpeg: MP4, MKV, AVI, MOV, FLV, WebM, 3GP, and others. Codecs must be recognized by your device's video decoder.
+
+**Q: How much free storage do I need for compression?**
+
+Temporary space needed during compression is approximately equal to the input file size. Save location must have sufficient space for the output file. Clear app cache if space is low.
+
+**Q: Why is compression slower on Android 7.0 compared to newer versions?**
+
+Android 7.0 lacks some hardware acceleration features available in 8.0+. Software encoding is slower. Update if possible, or reduce resolution/quality for faster processing.
+
+**Q: What should I do if compression fails or gets stuck?**
+
+Check available storage (>200MB recommended). Ensure video file is not corrupted. Restart the app. For persistent issues, report with device info (`flutter doctor` output) and video details.
+
+**Q: Can I compress to multiple formats in one pass?**
+
+No. Each compression creates one output file in one format. For multiple outputs, compress multiple times with different settings.
 
 ---
 

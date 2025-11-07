@@ -17,6 +17,28 @@ Una potente applicazione Android di compressione video costruita con Flutter. VC
 
 ---
 
+## Indice
+
+- [Funzionalità](#funzionalità)
+- [Anteprima dell'Interfaccia Utente](#anteprima-dellinterfaccia-utente)
+- [Specifiche Tecniche](#specifiche-tecniche)
+- [Architettura](#architettura)
+- [Installazione e Configurazione](#installazione-e-configurazione)
+- [Utilizzo](#utilizzo)
+- [Sviluppo](#sviluppo)
+- [Test](#test)
+- [Ottimizzazioni delle Prestazioni](#ottimizzazioni-delle-prestazioni)
+- [Compatibilità](#compatibilità)
+- [Risoluzione dei Problemi](#risoluzione-dei-problemi)
+- [Gestione delle Dipendenze](#gestione-delle-dipendenze)
+- [Decisioni Architettoniche](#decisioni-architettoniche)
+- [Contributi](#contributi)
+- [Domande Frequenti](#domande-frequenti)
+- [Licenza](#licenza)
+- [Supporto](#supporto)
+
+---
+
 ## Funzionalità
 
 ### Compressione Principale
@@ -490,6 +512,54 @@ Le contribuzioni sono benvenute! Per favore:
 - [ ] Più traduzioni linguistiche
 - [ ] Benchmark di performance
 - [ ] Miglioramenti accessibilità
+
+---
+
+## Domande Frequenti
+
+D: Quanto tempo impiega tipicamente la compressione video?
+
+R: Il tempo dipende dalle dimensioni del video, dalla risoluzione, dal codec target e dall'hardware del dispositivo. Un video di 100 MB può richiedere 2-5 minuti su un dispositivo di fascia media. L'accelerazione hardware (H.264/H.265 con MediaCodec) riduce significativamente il tempo di elaborazione.
+
+D: Quale è la differenza tra gli algoritmi di compressione (VP8, VP9, H.264, H.265)?
+
+R: H.265 fornisce il miglior rapporto di compressione ma codifica più lenta. H.264 bilancia compressione e velocità. VP9 offre ottimizzazione web. VP8 è obsoleto e raramente utilizzato. Scegli H.265 per massima riduzione della dimensione, H.264 per compatibilità e velocità.
+
+D: Il file video originale verrà eliminato dopo la compressione?
+
+R: No. VCompress salva il video compresso in un nuovo file. L'originale rimane intatto. Puoi abilitare la sovrascrittura nelle Impostazioni se lo desideri.
+
+D: Perché il mio dispositivo si riscalda durante la compressione?
+
+R: La compressione video consuma molta CPU/GPU. Su dispositivi più vecchi, l'elaborazione prolungata genera calore. Questo è normale. Riduci la risoluzione target o dividi i video grandi in segmenti per minimizzare la generazione di calore.
+
+D: Quali permessi richiede VCompress e perché?
+
+R: Archiviazione: Lettura/scrittura file video. Notifiche: Mostra progresso compressione. Fotocamera/Microfono: Non richiesti; l'app non li utilizza. I permessi vengono richiesti solo quando necessario.
+
+D: Posso comprimere video in background o mentre uso altre app?
+
+R: Sì. VCompress esegue la compressione come servizio di background. Puoi navigare, usare altre app o bloccare il dispositivo. Le notifiche di progresso ti mantengono informato.
+
+D: Quali formati video sono supportati come input?
+
+R: Qualsiasi formato supportato da FFmpeg: MP4, MKV, AVI, MOV, FLV, WebM, 3GP e altri. I codec devono essere riconosciuti dal decoder video del tuo dispositivo.
+
+D: Quanto spazio libero mi serve per la compressione?
+
+R: Lo spazio temporaneo necessario durante la compressione è approssimativamente pari alla dimensione del file di input. La posizione di salvataggio deve avere spazio sufficiente per il file di output. Svuota la cache dell'app se lo spazio è basso.
+
+D: Perché la compressione è più lenta su Android 7.0 rispetto alle versioni più recenti?
+
+R: Android 7.0 manca di alcune funzionalità di accelerazione hardware disponibili su 8.0+. La codifica software è più lenta. Aggiorna se possibile, o riduci risoluzione/qualità per elaborazione più veloce.
+
+D: Cosa devo fare se la compressione fallisce o si blocca?
+
+R: Verifica lo spazio disponibile (>200 MB consigliato). Assicurati che il file video non sia corrotto. Riavvia l'app. Per problemi persistenti, segnala con le informazioni del dispositivo (output `flutter doctor`) e dettagli del video.
+
+D: Posso comprimere in più formati in una sola passata?
+
+R: No. Ogni compressione crea un file di output in un formato. Per più output, comprimi più volte con impostazioni diverse.
 
 ---
 

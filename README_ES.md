@@ -17,6 +17,28 @@ Una poderosa aplicación Android de compresión de videos construida con Flutter
 
 ---
 
+## Tabla de Contenidos
+
+- [Características](#características)
+- [Vista Previa de la Interfaz de Usuario](#vista-previa-de-la-interfaz-de-usuario)
+- [Especificaciones Técnicas](#especificaciones-técnicas)
+- [Arquitectura](#arquitectura)
+- [Instalación y Configuración](#instalación-y-configuración)
+- [Uso](#uso)
+- [Desarrollo](#desarrollo)
+- [Pruebas](#pruebas)
+- [Optimizaciones de Rendimiento](#optimizaciones-de-rendimiento)
+- [Compatibilidad](#compatibilidad)
+- [Solución de Problemas](#solución-de-problemas)
+- [Gestión de Dependencias](#gestión-de-dependencias)
+- [Decisiones de Arquitectura](#decisiones-de-arquitectura)
+- [Contribuciones](#contribuciones)
+- [Preguntas Frecuentes](#preguntas-frecuentes)
+- [Licencia](#licencia)
+- [Soporte](#soporte)
+
+---
+
 ## Características
 
 ### Compresión Principal
@@ -490,6 +512,54 @@ Asegúrate de que el dispositivo tenga:
 - [ ] Más traducciones de idiomas
 - [ ] Benchmarks de rendimiento
 - [ ] Mejoras de accesibilidad
+
+---
+
+## Preguntas Frecuentes
+
+P: ¿Cuánto tiempo tarda típicamente la compresión de video?
+
+R: El tiempo depende del tamaño del video, resolución, codec objetivo y hardware del dispositivo. Un video de 100MB puede tomar 2-5 minutos en un dispositivo de rango medio. La aceleración por hardware (H.264/H.265 con MediaCodec) reduce significativamente el tiempo de procesamiento.
+
+P: ¿Cuál es la diferencia entre los algoritmos de compresión (VP8, VP9, H.264, H.265)?
+
+R: H.265 proporciona la mejor relación de compresión pero codificación más lenta. H.264 equilibra compresión y velocidad. VP9 ofrece optimización web. VP8 es antiguo y poco usado. Elige H.265 para máxima reducción de tamaño, H.264 para compatibilidad y velocidad.
+
+P: ¿Se eliminará el archivo de video original después de la compresión?
+
+R: No. VCompress guarda el video comprimido en un nuevo archivo. Tu original permanece intacto. Puedes habilitar sobrescribir en Configuración si lo deseas.
+
+P: ¿Por qué se calienta mi dispositivo durante la compresión?
+
+R: La compresión de video consume mucha CPU/GPU. En dispositivos antiguos, el procesamiento sostenido genera calor. Esto es normal. Reduce la resolución objetivo o divide videos grandes en segmentos para minimizar la generación de calor.
+
+P: ¿Qué permisos necesita VCompress y por qué?
+
+R: Almacenamiento: Leer/escribir archivos de video. Notificaciones: Mostrar progreso de compresión. Cámara/Micrófono: No requeridos; la app no los usa. Los permisos se solicitan solo según sea necesario.
+
+P: ¿Puedo comprimir videos en segundo plano o mientras uso otras aplicaciones?
+
+R: Sí. VCompress ejecuta la compresión como un servicio de fondo. Puedes navegar, usar otras aplicaciones o bloquear el dispositivo. Las notificaciones de progreso te mantienen actualizado.
+
+P: ¿Qué formatos de video se soportan como entrada?
+
+R: Cualquier formato soportado por FFmpeg: MP4, MKV, AVI, MOV, FLV, WebM, 3GP y otros. Los codecs deben ser reconocidos por el decodificador de video de tu dispositivo.
+
+P: ¿Cuánto espacio libre necesito para comprimir?
+
+R: El espacio temporal necesario durante la compresión es aproximadamente igual al tamaño del archivo de entrada. La ubicación de guardado debe tener espacio suficiente para el archivo de salida. Limpia la caché de la app si el espacio es bajo.
+
+P: ¿Por qué es más lenta la compresión en Android 7.0 comparado con versiones más nuevas?
+
+R: Android 7.0 carece de algunas características de aceleración por hardware disponibles en 8.0+. La codificación por software es más lenta. Actualiza si es posible, o reduce resolución/calidad para procesamiento más rápido.
+
+P: ¿Qué debo hacer si la compresión falla o se queda atascada?
+
+R: Verifica almacenamiento disponible (>200MB recomendado). Asegúrate de que el archivo de video no esté corrupto. Reinicia la app. Para problemas persistentes, reporta con información del dispositivo (salida de `flutter doctor`) y detalles del video.
+
+P: ¿Puedo comprimir a múltiples formatos en una sola pasada?
+
+R: No. Cada compresión crea un archivo de salida en un formato. Para múltiples salidas, comprime varias veces con diferentes configuraciones.
 
 ---
 
