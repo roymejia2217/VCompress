@@ -4,9 +4,16 @@
 
 # VCompress
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Flutter](https://img.shields.io/badge/Flutter-3.32.8-blue.svg)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.8.1-blue.svg)](https://dart.dev)
+[![Android](https://img.shields.io/badge/Android-7.0%2B-green.svg)](https://www.android.com)
+[![GitHub Release](https://img.shields.io/github/v/release/roymejia2217/VCompress.svg)](https://github.com/roymejia2217/VCompress/releases)
+[![GitHub last commit](https://img.shields.io/github/last-commit/roymejia2217/VCompress.svg)](https://github.com/roymejia2217/VCompress)
+
 A powerful Android video compression application built with Flutter. VCompress provides intelligent video optimization with hardware acceleration, batch processing, and real-time progress tracking.
 
-**Platforms**: Android (7.0+)
+**Platforms**: Android (7.0+) | **Languages**: [English](README.md) | [Español](README_ES.md) | [Français](README_FR.md) | [Italiano](README_IT.md)
 
 ---
 
