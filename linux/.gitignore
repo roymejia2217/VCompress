@@ -1,0 +1,5 @@
+flutter/ephemeral
+
+# Build artifacts
+build/
+install/

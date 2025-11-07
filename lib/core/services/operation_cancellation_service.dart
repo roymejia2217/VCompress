@@ -1,0 +1,39 @@
+import 'package:flutter/material.dart';
+import 'package:vcompressor/ui/widgets/notifications/notifications.dart';
+
+///  SOLID: Single Responsibility - maneja únicamente la cancelación de operaciones
+///  DRY: Centraliza la lógica de cancelación para reutilización
+class OperationCancellationService {
+  /// Cancela una operación y muestra notificación apropiada
+  ///  SOLID: Open/Closed - extensible para diferentes tipos de operaciones
+  ///  DRY: Lógica centralizada de cancelación
+  static Future<void> cancelOperation({
+    required BuildContext context,
+    required VoidCallback onCancel,
+    String? customMessage,
+    AppNotificationConfig? notificationConfig,
+  }) async {
+    // Ejecutar la lógica de cancelación específica
+    onCancel();
+
+    // Mostrar notificación con contexto robusto
+    AppNotification.showWarning(
+      context,
+      customMessage ?? 'Operación cancelada',
+    );
+  }
+
+  /// Cancela operación de procesamiento de video específicamente
+  ///  SOLID: Single Responsibility - maneja solo cancelación de video
+  ///  DRY: Reutiliza la lógica base de cancelación
+  static Future<void> cancelVideoProcessing({
+    required BuildContext context,
+    required VoidCallback onCancel,
+  }) {
+    return cancelOperation(
+      context: context,
+      onCancel: onCancel,
+      customMessage: 'Procesamiento de video cancelado',
+    );
+  }
+}

@@ -1,0 +1,490 @@
+{
+  "@@locale": "fr",
+  
+  "appName": "VCompress",
+  "@appName": {
+    "description": "Nom de l'application"
+  },
+  
+  "appDescription": "Compressez les vidéos sans perdre en qualité",
+  "@appDescription": {
+    "description": "Description de l'application"
+  },
+  
+  "settings": "Paramètres",
+  "@settings": {
+    "description": "Titre des paramètres"
+  },
+  
+  "settingsSubtitle": "Paramètres de l'application",
+  "@settingsSubtitle": {
+    "description": "Sous-titre des paramètres"
+  },
+  
+  "appearance": "Apparence",
+  "@appearance": {
+    "description": "Titre de la section apparence"
+  },
+  
+  "language": "Langue",
+  "@language": {
+    "description": "Titre de la section langue"
+  },
+  
+  "spanish": "Espagnol",
+  "@spanish": {
+    "description": "Nom de la langue espagnole"
+  },
+  
+  "english": "Anglais",
+  "@english": {
+    "description": "Nom de la langue anglaise"
+  },
+  
+  "french": "Français",
+  "@french": {
+    "description": "Nom de la langue française"
+  },
+  
+  "storage": "Stockage",
+  "@storage": {
+    "description": "Titre de la section stockage"
+  },
+  
+  "light": "Clair",
+  "dark": "Sombre",
+  "system": "Auto",
+  
+  "saveFolder": "Dossier de sauvegarde",
+  "@saveFolder": {
+    "description": "Étiquette du dossier de sauvegarde"
+  },
+  
+  "changeFolder": "Changer le dossier",
+  "@changeFolder": {
+    "description": "Bouton pour changer le dossier"
+  },
+  
+  "noVideosSelected": "Aucune vidéo sélectionnée",
+  "import": "Importer",
+  "processing": "Traitement...",
+  "compress": "Compresser",
+  
+  "configurationTitle": "Paramètres de compression",
+  "@configurationTitle": {
+    "description": "Titre du modal de configuration"
+  },
+  
+  "configurationBatch": "Configuration pour {videoCount} vidéos",
+  "@configurationBatch": {
+    "placeholders": {
+      "videoCount": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "preset": "Préréglage",
+  "outputResolution": "Résolution de sortie",
+  "outputFormat": "Format de sortie",
+  
+  "removeAudio": "Supprimer l'audio",
+  "mirrorMode": "Mode miroir",
+  "squareFormat": "Format carré",
+  "adjustSpeed": "Ajuster la vitesse",
+  
+  "replaceOriginal": "Remplacer l'original",
+  "advancedOptions": "Options avancées",
+  "@advancedOptions": {
+    "description": "Titre des options avancées"
+  },
+  
+  "advancedSubtitle": "Édition et ajustements techniques",
+  "@advancedSubtitle": {
+    "description": "Sous-titre des options avancées"
+  },
+  
+  "applyToAll": "Appliquer à tous",
+  "save": "Enregistrer",
+  
+  "configureVideosNow": "Configurer {videoCount} vidéos maintenant ?",
+  "@configureVideosNow": {
+    "placeholders": {
+      "videoCount": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "useSameConfiguration": "Utiliser la même configuration",
+  "configureIndividually": "Configurer individuellement",
+  
+  "completed": "Terminé",
+  "error": "Erreur",
+  "fileSize": "Taille du fichier",
+  "duration": "Durée",
+  "resolution": "Résolution",
+  "format": "Format",
+  
+  "back": "Retour",
+  "home": "Accueil",
+  "delete": "Supprimer",
+  "configure": "Configurer",
+  "cancel": "Annuler",
+  
+  "loadingVideos": "Chargement des vidéos",
+  "@loadingVideos": {
+    "description": "Étiquette d'accessibilité pour le chargement des vidéos"
+  },
+  
+  "loadingProgress": "Chargement de la vidéo {current} sur {total}",
+  "@loadingProgress": {
+    "description": "Message de progression de chargement",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "analyzingVideos": "Analyse des vidéos",
+  "@analyzingVideos": {
+    "description": "Message d'analyse des vidéos"
+  },
+  
+  "permissionGranted": "Permission accordée avec succès",
+  "@permissionGranted": {
+    "description": "Message de permission unique accordée"
+  },
+  
+  "permissionsGranted": "{count} permissions accordées avec succès",
+  "@permissionsGranted": {
+    "description": "Message de permissions multiples accordées",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "saveDirectoryError": "Impossible d'obtenir le dossier de sauvegarde",
+  "@saveDirectoryError": {
+    "description": "Erreur lorsque le dossier de sauvegarde ne peut pas être obtenu"
+  },
+  
+  "compressedVideoPathNotFound": "Chemin de la vidéo compressée introuvable",
+  "@compressedVideoPathNotFound": {
+    "description": "Erreur lorsque le chemin de la vidéo compressée n'est pas trouvé"
+  },
+  
+  "compressedVideoShare": "Vidéo compressée : {fileName}",
+  "@compressedVideoShare": {
+    "description": "Texte de partage pour vidéo compressée",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "compressedVideoSubject": "Vidéo compressée avec {appName}",
+  "@compressedVideoSubject": {
+    "description": "Sujet de partage pour vidéo compressée",
+    "placeholders": {
+      "appName": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "shareError": "Erreur lors du partage : {errorMessage}",
+  "@shareError": {
+    "description": "Message d'erreur lorsque le partage échoue",
+    "placeholders": {
+      "errorMessage": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "results": "Résultats",
+  "@results": {
+    "description": "Titre de la page de résultats"
+  },
+  
+  "spaceFreed": "{space} économisé",
+  "@spaceFreed": {
+    "description": "Message d'espace économisé",
+    "placeholders": {
+      "space": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "videosCompressed": "{count} vidéos compressées",
+  "@videosCompressed": {
+    "description": "Nombre de vidéos compressées",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "compressing": "Compression",
+  "@compressing": {
+    "description": "Titre de la page de compression"
+  },
+  
+  "videoProgress": "Vidéo {current} sur {total}",
+  "@videoProgress": {
+    "description": "Message de progression de vidéo",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "backToHome": "Retour à l'accueil",
+  "@backToHome": {
+    "description": "Texte du bouton retour à l'accueil"
+  },
+  
+  "resolutionHelperText": "Hauteur cible. Le ratio d'aspect est maintenu.",
+  "@resolutionHelperText": {
+    "description": "Texte d'aide pour le sélecteur de résolution"
+  },
+  
+  "framesPerSecond": "Images par seconde",
+  "@framesPerSecond": {
+    "description": "Étiquette du toggle d'images par seconde"
+  },
+  
+  "waiting": "En attente...",
+  "@waiting": {
+    "description": "Message d'état d'attente"
+  },
+  
+  "percentCompleted": "{percent}% terminé",
+  "@percentCompleted": {
+    "description": "Message de pourcentage de progression",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "completedWithSize": "{size}",
+  "@completedWithSize": {
+    "description": "Message de terminé avec taille",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "unknownError": "Erreur inconnue",
+  "@unknownError": {
+    "description": "Message d'erreur inconnue"
+  },
+  
+  "cancelCompression": "Annuler la compression",
+  "@cancelCompression": {
+    "description": "Tooltip du bouton annuler compression"
+  },
+  
+  "configuration": "Paramètres",
+  "@configuration": {
+    "description": "Tooltip du bouton configuration"
+  },
+  
+  "share": "Partager",
+  "@share": {
+    "description": "Tooltip du bouton partager"
+  },
+  
+  "noAudio": "Sans audio",
+  "@noAudio": {
+    "description": "Résumé d'édition : configuration sans audio"
+  },
+  
+  "mirror": "Miroir",
+  "@mirror": {
+    "description": "Résumé d'édition : configuration miroir"
+  },
+  
+  "square": "Carré",
+  "@square": {
+    "description": "Résumé d'édition : configuration format carré"
+  },
+  
+  "speedFormat": "{speed}x",
+  "@speedFormat": {
+    "description": "Résumé d'édition : format de vitesse",
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "fpsFormat": "{fps} IPS",
+  "@fpsFormat": {
+    "description": "Résumé d'édition : format d'ips",
+    "placeholders": {
+      "fps": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "replaceOriginal": "Remplacer l'original",
+  "@replaceOriginal": {
+    "description": "Résumé d'édition : configuration de remplacement du fichier original"
+  },
+  
+  "maximaCalidad": "Qualité Maximale",
+  "@maximaCalidad": {
+    "description": "Algorithme de compression : qualité maximale"
+  },
+  
+  "excelenteCalidad": "Excellente Qualité",
+  "@excelenteCalidad": {
+    "description": "Algorithme de compression : excellente qualité"
+  },
+  
+  "buenaCalidad": "Bonne Qualité",
+  "@buenaCalidad": {
+    "description": "Algorithme de compression : bonne qualité"
+  },
+  
+  "compresionMedia": "Compression Moyenne",
+  "@compresionMedia": {
+    "description": "Algorithme de compression : compression moyenne"
+  },
+  
+  "ultraCompresion": "Ultra Compression",
+  "@ultraCompresion": {
+    "description": "Algorithme de compression : ultra compression"
+  },
+  
+  "original": "Original",
+  "@original": {
+    "description": "Résolution de sortie : résolution originale"
+  },
+  
+  "p1080": "1080p",
+  "@p1080": {
+    "description": "Résolution de sortie : 1080p"
+  },
+  
+  "p720": "720p",
+  "@p720": {
+    "description": "Résolution de sortie : 720p"
+  },
+  
+  "p480": "480p",
+  "@p480": {
+    "description": "Résolution de sortie : 480p"
+  },
+  
+  "p360": "360p",
+  "@p360": {
+    "description": "Résolution de sortie : 360p"
+  },
+  
+  "p240": "240p",
+  "@p240": {
+    "description": "Résolution de sortie : 240p"
+  },
+  
+  "p144": "144p",
+  "@p144": {
+    "description": "Résolution de sortie : 144p"
+  },
+  
+  "mp4": "MP4",
+  "@mp4": {
+    "description": "Format de sortie : MP4"
+  },
+  
+  "avi": "AVI",
+  "@avi": {
+    "description": "Format de sortie : AVI"
+  },
+  
+  "mov": "MOV",
+  "@mov": {
+    "description": "Format de sortie : MOV"
+  },
+  
+  "mkv": "MKV",
+  "@mkv": {
+    "description": "Format de sortie : MKV"
+  },
+  
+  "webm": "WebM",
+  "@webm": {
+    "description": "Format de sortie : WebM"
+  },
+
+  "selected": "{count,plural, =0{Aucun élément sélectionné} =1{1 élément sélectionné} other{{count} éléments sélectionnés}}",
+  "@selected": {
+    "description": "Nombre d'éléments sélectionnés message",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "filePickerError": "Erreur lors de la sélection des fichiers : {errorMessage}",
+  "@filePickerError": {
+    "description": "Erreur quand la sélection de fichiers échoue",
+    "placeholders": {
+      "errorMessage": {
+        "type": "String"
+      }
+    }
+  },
+
+  "permissionRequestError": "Erreur lors de la demande de permissions : {errorMessage}",
+  "@permissionRequestError": {
+    "description": "Erreur quand la demande de permissions échoue",
+    "placeholders": {
+      "errorMessage": {
+        "type": "String"
+      }
+    }
+  },
+
+  "permissionRequired": "Permissions requises",
+  "@permissionRequired": {
+    "description": "Titre du dialogue quand les permissions sont refusées"
+  },
+
+  "permissionDeniedMessage": "L'application a besoin d'accès à vos vidéos pour continuer. Veuillez activer les permissions dans les paramètres.",
+  "@permissionDeniedMessage": {
+    "description": "Message quand les permissions sont refusées"
+  },
+
+  "openSettings": "Ouvrir les paramètres",
+  "@openSettings": {
+    "description": "Bouton pour ouvrir les paramètres dans le dialogue de permissions"
+  },
+
+  "uriResolutionFailed": "Impossible d'obtenir le chemin d'accès d'origine, le chemin temporaire sera utilisé",
+  "@uriResolutionFailed": {
+    "description": "Avertissement quand la résolution d'URI échoue"
+  }
+}

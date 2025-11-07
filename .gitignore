@@ -1,0 +1,66 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IDEs and Editors
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+.cxx/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Local development and IDE-specific
+.aim/
+.cursor/
+.claude/
+.claude-context.db
+test_videos/
+/docs/
+
+# Configuration files
+CLAUDE.md
+.env
+key.properties
+
+# Node.js (not needed for Flutter)
+package.json
+package-lock.json
+node_modules/
+
+# Unsupported platforms
+/web/
+/windows/
+/macos/
+/ios/
+
+# Android builds
+/android/app/debug
+/android/app/profile
+/android/app/release
