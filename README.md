@@ -2,7 +2,7 @@
   <img src="android/app/src/main/play_store_512.png" alt="VCompressor Logo" width="200" height="200">
 </div>
 
-# VCompressor - Video Compression Made Simple
+# VCompressor
 
 A powerful Android video compression application built with Flutter. VCompressor provides intelligent video optimization with hardware acceleration, batch processing, and real-time progress tracking.
 
