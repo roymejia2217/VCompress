@@ -220,10 +220,10 @@ class AppVideoListItem extends ConsumerWidget {
 
     // Línea 1: Configuración del video
     if (config.variant == AppVideoListItemVariant.results) {
-      // Results: Menos info, solo algorithm y format
+      // Results: Menos info, solo algorithm y format (localizado)
       subtitleLines.add(
         Text(
-          '${task.settings.algorithm.displayName} · ${task.settings.format.label}',
+          '${getLocalizedAlgorithmName(task.settings.algorithm, context)} · ${getLocalizedFormatLabel(task.settings.format, context)}',
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
