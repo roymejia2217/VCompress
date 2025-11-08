@@ -169,16 +169,12 @@
 -keep class android.app.Activity { *; }
 -keep class android.content.ContextWrapper { *; }
 
-# Google Play Core rules (suppress warnings for missing optional classes)
--dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication
--dontwarn com.google.android.play.core.splitinstall.SplitInstallException
--dontwarn com.google.android.play.core.splitinstall.SplitInstallManager
--dontwarn com.google.android.play.core.splitinstall.SplitInstallManagerFactory
--dontwarn com.google.android.play.core.splitinstall.SplitInstallRequest$Builder
--dontwarn com.google.android.play.core.splitinstall.SplitInstallRequest
--dontwarn com.google.android.play.core.splitinstall.SplitInstallSessionState
--dontwarn com.google.android.play.core.splitinstall.SplitInstallStateUpdatedListener
--dontwarn com.google.android.play.core.tasks.OnFailureListener
--dontwarn com.google.android.play.core.tasks.OnSuccessListener
--dontwarn com.google.android.play.core.tasks.Task
+# Google Play Core rules - REMOVE for F-Droid compatibility
+# These classes are only needed for Google Play Store dynamic delivery
+# For F-Droid builds, remove them completely using -assumenosideeffects
+-assumenosideeffects class com.google.android.play.core.** {
+    public <methods>;
+    public <fields>;
+}
+-dontwarn com.google.android.play.core.**
 
