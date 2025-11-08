@@ -58,8 +58,8 @@ android {
             // Configure proper release signing
             // Create keystore with: keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
             signingConfig = signingConfigs.getByName("release")
-            // Enable minification with ProGuard to remove Google Play Core classes for F-Droid
-            isMinifyEnabled = true
+            // Disable minification - it breaks the app. Use F-Droid scandelete instead.
+            isMinifyEnabled = false
             isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
