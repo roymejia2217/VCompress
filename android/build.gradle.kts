@@ -2,7 +2,6 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven("https://releases.arthenica.com/maven")
     }
 }
 
