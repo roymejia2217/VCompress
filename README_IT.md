@@ -8,12 +8,12 @@
 [![Flutter](https://img.shields.io/badge/Flutter-3.32.8-blue.svg)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.8.1-blue.svg)](https://dart.dev)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-green.svg)](https://www.android.com)
-[![Rilascio GitHub](https://img.shields.io/github/v/release/roymejia2217/VCompress.svg)](https://github.com/roymejia2217/VCompress/releases)
-[![Ultimo commit GitHub](https://img.shields.io/github/last-commit/roymejia2217/VCompress.svg)](https://github.com/roymejia2217/VCompress)
+[![GitHub Release](https://img.shields.io/github/v/release/roymejia2217/VCompress.svg)](https://github.com/roymejia2217/VCompress/releases)
+[![Ultimo Commit GitHub](https://img.shields.io/github/last-commit/roymejia2217/VCompress.svg)](https://github.com/roymejia2217/VCompress)
 
-Una potente applicazione Android di compressione video costruita con Flutter. VCompress fornisce ottimizzazione video intelligente con accelerazione hardware, elaborazione in batch e tracciamento della progressione in tempo reale.
+Una potente applicazione Android di compressione video costruita con Flutter. VCompress offre un'ottimizzazione intelligente dei video con accelerazione hardware, elaborazione batch e monitoraggio della progressione in tempo reale.
 
-**Piattaforme**: Android (7.0+) | **Lingue**: [English](README.md) | [Español](README_ES.md) | [Français](README_FR.md)
+**Piattaforme**: Android (7.0+) | **Lingue**: [English](README.md) | [Español](README_ES.md) | [Français](README_FR.md) | [Italiano](README_IT.md)
 
 ---
 
@@ -27,12 +27,12 @@ Una potente applicazione Android di compressione video costruita con Flutter. VC
 - [Utilizzo](#utilizzo)
 - [Sviluppo](#sviluppo)
 - [Test](#test)
-- [Ottimizzazioni delle Prestazioni](#ottimizzazioni-delle-prestazioni)
+- [Ottimizzazioni di Performance](#ottimizzazioni-di-performance)
 - [Compatibilità](#compatibilità)
 - [Risoluzione dei Problemi](#risoluzione-dei-problemi)
 - [Gestione delle Dipendenze](#gestione-delle-dipendenze)
-- [Decisioni Architettoniche](#decisioni-architettoniche)
-- [Contributi](#contributi)
+- [Decisioni Architetturali](#decisioni-architetturali)
+- [Contribuzioni](#contribuzioni)
 - [Domande Frequenti](#domande-frequenti)
 - [Licenza](#licenza)
 - [Supporto](#supporto)
@@ -43,23 +43,23 @@ Una potente applicazione Android di compressione video costruita con Flutter. VC
 
 ### Compressione Principale
 - **Algoritmi di Compressione Multipli**: VP8, VP9, H.264, H.265 con supporto di accelerazione hardware
-- **Elaborazione in Batch**: Comprimi più video simultaneamente con accodamento intelligente
-- **Tracciamento della Progressione in Tempo Reale**: Indicatori di progresso dal vivo per operazioni di importazione e compressione
+- **Elaborazione Batch**: Comprimi più video simultaneamente con coda intelligente
+- **Monitoraggio della Progressione in Tempo Reale**: Indicatori di avanzamento dal vivo per importazione e operazioni di compressione
 - **Selezione Intelligente della Risoluzione**: Profili predefiniti (720p, 1080p, 2K, 4K) con opzioni personalizzate
-- **Flessibilità di Formato**: Supporto per contenitori di output MP4, WebM, MKV
+- **Flessibilità del Formato**: Supporto per contenitori di output MP4, WebM, MKV
 
 ### Funzionalità Avanzate
 - **Rilevamento Hardware**: Rilevamento automatico delle capacità del dispositivo (core CPU, RAM, supporto codec)
-- **Integrazione FFmpeg**: Elaborazione video standard del settore con ffmpeg_kit_flutter_new
+- **Integrazione FFmpeg**: Elaborazione video standard industriale con ffmpeg_kit_flutter_new
 - **Generazione di Miniature**: Estrazione automatica delle miniature video con caching
-- **Estrazione di Metadati**: Analisi completa dei video (durata, risoluzione, codec, fps)
-- **Gestione File**: Sostituzione sicura dei file con opzioni di backup e risoluzione URI MediaStore
+- **Estrazione dei Metadati**: Analisi completa dei video (durata, risoluzione, codec, fps)
+- **Gestione dei File**: Sostituzione sicura dei file con opzioni di backup e risoluzione URI MediaStore
 - **Sistema di Notifiche**: Notifiche di progressione della compressione in tempo reale
 
 ### Esperienza Utente
 - **Material Design 3**: Interfaccia moderna e reattiva con tematizzazione dinamica dei colori
-- **Supporto Multilingue**: Spagnolo (es), Inglese (en), Francese (fr) con Flutter Intl
-- **Impostazioni Localizzate**: Modalità tema (chiaro/scuro/sistema), selezione lingua, directory di salvataggio personalizzata
+- **Supporto Multilingue**: Spagnolo (es), Inglese (en), Francese (fr), Italiano (it) con Flutter Intl
+- **Impostazioni Localizzate**: Modalità tema (chiaro/scuro/sistema), selezione della lingua, directory di salvataggio personalizzata
 - **Modalità Scura**: Supporto completo del tema scuro Material 3 con Flex Color Scheme
 - **Accessibilità**: Etichette semantiche, navigazione da tastiera, supporto per lettori di schermo
 
@@ -71,15 +71,15 @@ Una potente applicazione Android di compressione video costruita con Flutter. VC
 
 VCompress offre un'interfaccia intuitiva in Material Design 3 che guida gli utenti attraverso il processo di compressione video:
 
-| **Passaggio 1: Importa** | **Passaggio 2: Configura** | **Passaggio 3: Elabora** | **Passaggio 4: Risultati** |
+| **Passo 1: Importa** | **Passo 2: Configura** | **Passo 3: Elabora** | **Passo 4: Risultati** |
 |:---:|:---:|:---:|:---:|
 | Sfoglia e seleziona video dal tuo dispositivo | Configura le impostazioni di compressione (algoritmo, risoluzione, formato) | Monitora la progressione della compressione in tempo reale | Visualizza i video compressi ed esporta |
-| ![Home](docs/mockups/home_page_withvideo.png) | ![Modale Config](docs/mockups/videoconfigmodal.png) | ![Compressione](docs/mockups/process_page_video_compressing.png) | ![Risultati](docs/mockups/process_Page_result_videocompressed.png) |
+| ![Home](docs/mockups/home_page_withvideo.png) | ![Modal Config](docs/mockups/videoconfigmodal.png) | ![Compressione](docs/mockups/process_page_video_compressing.png) | ![Risultati](docs/mockups/process_Page_result_videocompressed.png) |
 
 ### Funzionalità Avanzate
 
-**Impostazioni Dettagliate** - Espandi il modale di configurazione per il controllo granulare dei parametri di compressione
-![Modale Espanso](docs/mockups/videoconfigmodal_expanded.png)
+**Regolazione Fine** - Espandi il modal di configurazione per un controllo granulare dei parametri di compressione
+![Modal Espanso](docs/mockups/videoconfigmodal_expanded.png)
 
 **Riproduzione Nativa** - Visualizza i video compressi utilizzando il lettore multimediale nativo del tuo dispositivo
 ![Riproduzione](docs/mockups/video_player_watching_result.png)
@@ -111,7 +111,7 @@ VCompress offre un'interfaccia intuitiva in Material Design 3 che guida gli uten
 |-------|---------|
 | **H.264** | MediaCodec (hardware) |
 | **H.265** | MediaCodec (hardware) |
-| **VP9** | MediaCodec (hardware su 8.0+) |
+| **VP9** | MediaCodec (hardware da 8.0+) |
 
 ---
 
@@ -120,17 +120,17 @@ VCompress offre un'interfaccia intuitiva in Material Design 3 che guida gli uten
 ### Stack Tecnologico
 
 ```
-Gestione dello Stato: Riverpod 2.6.1 (FutureProvider, StateNotifier)
-Navigazione:         GoRouter 16.2.0 (routing type-safe)
-Framework UI:        Flutter Material 3
-Elaborazione Video:  FFmpeg (ffmpeg_kit_flutter_new 3.2.0)
-Archiviazione:       SharedPreferences + Path Provider
-Icone:               Phosphor Flutter
-Tematizzazione:      Flex Color Scheme 8.2.0
-Localizzazione:      Flutter Intl (file .arb)
-Permessi:            Permission Handler 12.0.1
-Selezione File:      File Picker 10.3.2
-Miniature:           Video Thumbnail 0.5.3
+Gestione dello Stato:     Riverpod 2.6.1 (FutureProvider, StateNotifier)
+Navigazione:             GoRouter 16.2.0 (routing type-safe)
+Framework UI:            Flutter Material 3
+Elaborazione Video:      FFmpeg (ffmpeg_kit_flutter_new 3.2.0)
+Archiviazione:           SharedPreferences + Path Provider
+Icone:                   Phosphor Flutter
+Tematizzazione:          Flex Color Scheme 8.2.0
+Localizzazione:          Flutter Intl (file .arb)
+Permessi:                Permission Handler 12.0.1
+Selezione File:          File Picker 10.3.2
+Miniature:               Video Thumbnail 0.5.3
 ```
 
 ### Struttura del Progetto
@@ -144,31 +144,31 @@ lib/
 │   ├── error/
 │   │   └── app_error.dart            # Gestione centralizzata degli errori
 │   ├── performance/
-│   │   └── memory_manager.dart       # Monitoraggio e ottimizzazione della memoria
+│   │   └── memory_manager.dart       # Tracciamento e ottimizzazione della memoria
 │   └── result/
 │       └── result.dart               # Tipo Result<T, E> generico
 │
-├── data/                              # Livello dati e servizi
+├── data/                              # Layer di dati e servizi
 │   ├── repositories/                 # Repository di dati
 │   └── services/                     # 15 servizi specializzati
 │
-├── domain/                            # Logica di business e casi d'uso
+├── domain/                            # Logica di business e use case
 │   └── usecases/
 │       └── add_video_files_usecase.dart
 │
 ├── models/                            # Modelli di dati
-│   ├── video_task.dart               # Attività di compressione video
+│   ├── video_task.dart               # Task di compressione video
 │   ├── video_settings.dart           # Impostazioni di compressione
 │   ├── hardware_info.dart            # Capacità del dispositivo
 │   └── compression_result.dart       # Risultati dell'elaborazione
 │
 ├── providers/                         # Gestione dello stato Riverpod (8 provider)
-│   ├── batch_config_provider.dart    # Configurazione elaborazione in batch
+│   ├── batch_config_provider.dart    # Configurazione elaborazione batch
 │   ├── error_handler_provider.dart   # Gestione globale degli errori
 │   ├── hardware_provider.dart        # Capacità del dispositivo
 │   ├── loading_provider.dart         # Stati di caricamento e progressione
-│   ├── settings_provider.dart        # Preferenze dell'utente
-│   ├── tasks_provider.dart           # Gestione coda attività
+│   ├── settings_provider.dart        # Preferenze utente
+│   ├── tasks_provider.dart           # Gestione della coda di task
 │   ├── video_config_provider.dart    # Configurazione compressione individuale
 │   └── video_services_provider.dart  # Provider di servizi
 │
@@ -188,13 +188,14 @@ lib/
 │   └── widgets/                      # Componenti riutilizzabili
 │
 ├── utils/                             # Funzioni di utilità
-│   └── cache_service.dart            # Servizio cache in memoria e su disco
+│   └── cache_service.dart            # Servizio di cache in memoria e su disco
 │
 ├── l10n/                              # Localizzazione
 │   ├── app_localizations.dart        # Localizzazioni generate
 │   ├── app_es.arb                    # Traduzioni spagnole
 │   ├── app_en.arb                    # Traduzioni inglesi
-│   └── app_fr.arb                    # Traduzioni francesi
+│   ├── app_fr.arb                    # Traduzioni francesi
+│   └── app_it.arb                    # Traduzioni italiane
 │
 ├── l10n.yaml                         # Configurazione localizzazione
 └── main.dart                         # Punto di ingresso dell'applicazione
@@ -206,7 +207,7 @@ android/                               # Configurazione specifica Android
 │   ├── kotlin/                       # Codice sorgente Kotlin
 │   └── res/
 │       ├── mipmap-*/                 # Icone dell'applicazione
-│       ├── values/                   # Stringhe, colori, temi
+│       ├── values/                   # String, colori, temi
 │       └── play_store_512.png        # Icona Play Store
 │
 ├── build.gradle                      # Gradle a livello di progetto
@@ -217,28 +218,28 @@ test/                                  # Suite di test (5 categorie)
 ├── integration/                      # Test di integrazione
 ├── performance/                      # Test di performance
 ├── unit/                             # Test unitari
-└── widget/                           # Test widget
+└── widget/                           # Test di widget
 ```
 
 ### Servizi Chiave Spiegati
 
 #### VideoProcessorService / VideoProcessorServiceMobile
-Gestisce la compressione video basata su FFmpeg. Costruisce comandi FFmpeg in base alle impostazioni, monitora la progressione e gestisce le ottimizzazioni specifiche della piattaforma.
+Gestisce la compressione video basata su FFmpeg. Costruisce i comandi FFmpeg in base alla configurazione, monitora la progressione e gestisce le ottimizzazioni specifiche della piattaforma.
 
 #### VideoMetadataService / VideoMetadataServiceMobile
-Estrae metadati video utilizzando FFprobe: durata, risoluzione, codec, fps. Genera miniature per l'anteprima UI.
+Estrae i metadati video usando FFprobe: durata, risoluzione, codec, fps. Genera miniature per l'anteprima dell'interfaccia utente.
 
 #### HardwareDetectionService
 Rileva le capacità del dispositivo (core CPU, RAM, codec disponibili) per le decisioni di ottimizzazione.
 
 #### FFmpegProgressService
-Tracciamento della progressione in tempo reale dall'analisi dell'output FFmpeg. Converte bitrate/tempo in percentuale di completamento.
+Monitoraggio della progressione in tempo reale dall'analisi dell'output FFmpeg. Converte il bitrate/tempo in percentuale di completamento.
 
 #### NotificationService
 Invia notifiche di sistema per la progressione della compressione e gli eventi.
 
 #### CacheService
-Singleton per il caching in memoria e su disco (SharedPreferences). Memorizza miniature, metadati, file recenti.
+Singleton per il caching in memoria e su disco (SharedPreferences). Memorizza le miniature, i metadati, i file recenti.
 
 ---
 
@@ -247,7 +248,7 @@ Singleton per il caching in memoria e su disco (SharedPreferences). Memorizza mi
 ### Prerequisiti
 - **Flutter**: 3.19.0+ ([guida di installazione](https://flutter.dev/docs/get-started/install))
 - **Dart**: 3.6.0+ (incluso in Flutter)
-- **Android SDK**: API 24+ per build Android
+- **Android SDK**: API 24+ per le compilazioni Android
 
 ### Clonare il Repository
 ```bash
@@ -270,7 +271,7 @@ flutter gen-l10n
 **Dispositivo/Emulatore Android**:
 ```bash
 flutter run -d android
-# o per dispositivo specifico
+# o per un dispositivo specifico
 flutter run -d <device_id>
 ```
 
@@ -285,45 +286,45 @@ flutter build appbundle --release
 
 ## Utilizzo
 
-### Flusso di Lavoro di Base
+### Flusso di Lavoro Base
 
-1. **Importare Video**: Tocca il pulsante di importazione, seleziona uno o più video
-2. **Configurare la Compressione**: Scegli algoritmo, risoluzione, formato (individuale o batch)
-3. **Monitorare la Progressione**: Osserva le barre di progresso in tempo reale durante importazione e compressione
-4. **Salvare Video Compressi**: I file vengono salvati nella directory configurata (predefinita: Download/VCompress)
+1. **Importa Video**: Premi il pulsante di importazione, seleziona uno o più video
+2. **Configura Compressione**: Scegli l'algoritmo, la risoluzione, il formato (singolo o batch)
+3. **Monitora Progressione**: Osserva le barre di progressione dal vivo durante l'importazione e la compressione
+4. **Salva Video Compressi**: I file vengono salvati nella directory configurata (default: Download/VCompress)
 
 ### Impostazioni di Compressione
 
-| Impostazione | Opzioni | Note |
-|---|---|---|
-| **Algoritmo** | VP8, VP9, H.264, H.265, AV1 | H.265 miglior compressione, H.264 miglior compatibilità |
-| **Risoluzione** | 720p, 1080p, 2K, 4K, Personalizzato | Ridurre risoluzione riduce significativamente dimensione file |
+| Parametro | Opzioni | Note |
+|-----------|---------|-------|
+| **Algoritmo** | VP8, VP9, H.264, H.265, AV1 | H.265 migliore compressione, H.264 migliore compatibilità |
+| **Risoluzione** | 720p, 1080p, 2K, 4K, Personalizzato | Ridurre la risoluzione diminuisce significativamente la dimensione del file |
 | **Formato** | MP4, WebM, MKV | MP4 più compatibile, WebM più piccolo |
-| **Qualità** | 18-28 CRF | Inferiore = miglior qualità, file più grandi |
-| **FPS** | Originale, 15, 24, 30, 60 | Ridurre fps salva larghezza di banda |
+| **Qualità** | 18-28 CRF | Minore = migliore qualità, file più grandi |
+| **FPS** | Originale, 15, 24, 30, 60 | Ridurre gli fps risparmia larghezza di banda |
 
-### Elaborazione in Batch
+### Elaborazione Batch
 
-Abilita modalità batch per comprimere più video con impostazioni coerenti:
+Abilita la modalità batch per comprimere più video con parametri coerenti:
 1. Seleziona più video durante l'importazione
-2. Configura le impostazioni una volta (applicate a tutti)
-3. I processi vengono accodati automaticamente
-4. Monitora tutto il progresso in un'unica lista
+2. Configura i parametri una volta (applicati a tutti)
+3. I processi vengono automaticamente messi in coda
+4. Monitora l'intero avanzamento in un'unica lista
 
 ### Configurazione Archiviazione
 
-Modifica la directory di salvataggio in Impostazioni > Archiviazione > Cambia Cartella. Posizioni personalizzate supportate su Android 11+.
+Modifica la directory di salvataggio in Impostazioni > Archiviazione > Cambia Cartella. Posizioni personalizzate supportate da Android 11+.
 
 ---
 
 ## Sviluppo
 
-### Stile di Codice
+### Stile del Codice
 
 - **Formato**: Esegui `flutter format lib/` regolarmente
-- **Analisi**: Mantieni avvertimenti di `flutter analyze` a 0
+- **Analisi**: Mantieni gli avvisi `flutter analyze` a 0
 - **Commenti**: Spiega il *perché*, non il *cosa* (il codice mostra cosa)
-- **Nomenclatura**: Nomi descrittivi con suffissi per classi specializzate (es: `_mobile.dart` per specifico di piattaforma)
+- **Nomenclatura**: Nomi descrittivi con suffissi per le classi specializzate (es: `_mobile.dart` per specifico della piattaforma)
 
 ### Flussi di Lavoro Comuni
 
@@ -331,7 +332,7 @@ Modifica la directory di salvataggio in Impostazioni > Archiviazione > Cambia Ca
 ```bash
 flutter analyze
 grep -r "search_term" lib/
-# (modifica file)
+# (modifica i file)
 flutter format lib/
 flutter analyze
 flutter test
@@ -340,7 +341,7 @@ flutter run -d android
 
 **Implementazione Funzionalità**:
 ```bash
-# (crea/modifica file)
+# (crea/modifica i file)
 flutter format lib/
 flutter analyze
 flutter test test/unit/
@@ -353,13 +354,13 @@ flutter run -d android
 
 ### Categorie di Test
 
-| Categoria | Ubicazione | Scopo |
-|-----------|-----------|-------|
-| **Unitari** | `test/unit/` | Logica servizi, algoritmi, calcoli |
+| Categoria | Posizione | Obiettivo |
+|-----------|-----------|----------|
+| **Unitari** | `test/unit/` | Logica di servizio, algoritmi, calcoli |
 | **Widget** | `test/widget/` | Componenti UI, rendering, interazioni |
 | **Integrazione** | `test/integration/` | Flussi end-to-end, servizi multipli |
-| **Accessibilità** | `test/accessibility/` | Lettori di schermo, navigazione tastiera |
-| **Performance** | `test/performance/` | Benchmark, uso memoria, frequenza fotogrammi |
+| **Accessibilità** | `test/accessibility/` | Lettori di schermo, navigazione da tastiera |
+| **Performance** | `test/performance/` | Benchmark, utilizzo memoria, frame rate |
 
 ### Eseguire i Test
 
@@ -376,30 +377,30 @@ flutter test --coverage
 
 ### Gestione della Memoria
 
-- **Caching Miniature**: Cache su disco per miniature video
-- **Caricamento Differito**: Le liste usano `ListView.builder` per efficienza memoria
-- **Monitoraggio Memoria**: `MemoryManager` traccia uso heap, attiva pulizia
-- **Caching Metadati**: Estrae una volta, riutilizza in tutte le operazioni
+- **Caching di Miniature**: Cache su disco per le miniature video
+- **Caricamento Differito**: Le liste usano `ListView.builder` per l'efficienza della memoria
+- **Tracciamento Memoria**: `MemoryManager` traccia l'utilizzo dell'heap, attiva la pulizia
+- **Caching Metadati**: Estratto una volta, riutilizzato per tutte le operazioni
 
 ### Ottimizzazione FFmpeg
 
 - **Accelerazione Hardware**: Usa MediaCodec su Android per H.264/H.265
-- **Codifica Guidata da Profilo**: Preset FFmpeg (ultrafast, superfast, fast) secondo dispositivo
-- **Elaborazione per Segmenti**: Processa video in segmenti per file grandi
-- **Attività Parallele**: Compressioni multiple con accodamento intelligente
+- **Codifica Guidata da Profilo**: FFmpeg preset (ultrafast, superfast, fast) in base al dispositivo
+- **Elaborazione Segmentata**: Elabora il video in segmenti per file di grandi dimensioni
+- **Task Paralleli**: Multiple compressions con coda intelligente
 
 ### Performance UI
 
-- **Selettori Provider**: Osserva solo stato necessario (`.select()`)
-- **Limiti Repaint**: Barre progresso non riconstruiscono intera lista
-- **Costruttori Const**: Widget marcati `const` dove possibile
+- **Selettori Provider**: Osserva solo lo stato necessario (`.select()`)
+- **Limiti Repaint**: Le barre di progressione non ricostruiscono l'intera lista
+- **Costruttori Const**: Widget contrassegnati `const` dove possibile
 - **Cache Immagine**: Miniature cachate con ImageCache
 
 ### Archiviazione e Rete
 
 - **Elaborazione Locale**: Tutta l'elaborazione avviene sul dispositivo
-- **I/O Efficiente**: SharedPreferences per impostazioni, Path Provider per file
-- **Integrazione MediaStore**: Usa Android MediaStore per corretta risoluzione URI
+- **I/O Efficiente**: SharedPreferences per le impostazioni, Path Provider per i file
+- **Integrazione MediaStore**: Usa Android MediaStore per la corretta risoluzione degli URI
 
 ---
 
@@ -408,12 +409,12 @@ flutter test --coverage
 ### Versioni Android
 
 | Versione | API | Stato | Note |
-|----------|-----|-------|-------|
-| **7.0** | 24 | Supportato | Versione minima |
-| **8.0** | 26 | Supportato | Supporto hardware VP9 |
-| **9.0** | 28 | Supportato | Archiviazione per scopo migliorata |
-| **11.0+** | 30+ | Consigliato | Archiviazione per scopo completa |
-| **14.0+** | 34+ | Supporto completo | API più recenti |
+|---------|-----|--------|-------|
+| **7.0** | 24 | Compatibile | Versione minima |
+| **8.0** | 26 | Compatibile | Supporto hardware VP9 |
+| **9.0** | 28 | Compatibile | Archiviazione scoped migliorata |
+| **11.0+** | 30+ | Consigliato | Archiviazione scoped completa |
+| **14.0+** | 34+ | Supporto completo | APIs più recenti |
 
 ---
 
@@ -421,39 +422,39 @@ flutter test --coverage
 
 ### Problemi Comuni
 
-#### Build Fallisce: "Android SDK not found"
+#### Errore di Compilazione: "Android SDK not found"
 ```bash
-flutter config --android-sdk /percorso/a/android-sdk
+flutter config --android-sdk /percorso/verso/android-sdk
 flutter doctor
 ```
 
-#### Errori FFmpeg Durante Compressione
+#### Errori FFmpeg Durante la Compressione
 ```bash
 ffmpeg -version
 flutter run -d android --verbose
 ```
 
-#### Timeout Durante Importazione Video (50+ file)
-Il timeout di importazione scala automaticamente: **30 + (numero file) secondi**.
+#### Timeout Durante l'Importazione di Video (50+ file)
+Il timeout di importazione si regola automaticamente: **30 + (numero di file) secondi**.
 
-#### Memoria Insufficiente su Video Grandi
-- Chiudi altre app
-- Riduci risoluzione target
-- Svuota cache: Impostazioni > Svuota Cache
+#### Memoria Insufficiente su File Video di Grandi Dimensioni
+- Chiudi altre applicazioni
+- Riduci la risoluzione target
+- Svuota la cache: Impostazioni > Svuota Cache
 
-#### Modalità Scura Non Funziona
+#### Modalità Scura Non Funzionante
 Assicurati che il dispositivo abbia:
-1. "Usa tema del sistema" abilitato in Impostazioni
-2. Modalità scura di sistema attivata (Android 9+)
+1. "Usa tema di sistema" abilitato in Impostazioni
+2. Modalità scura di sistema abilitata (Android 9+)
 
 ---
 
-## Gestione Dipendenze
+## Gestione delle Dipendenze
 
 ### Dipendenze Principali
 
-| Pacchetto | Versione | Scopo |
-|-----------|----------|-------|
+| Pacchetto | Versione | Obiettivo |
+|---------|---------|----------|
 | **flutter** | 3.32.8 | Framework UI |
 | **flutter_riverpod** | 2.6.1 | Gestione dello stato |
 | **go_router** | 16.2.0 | Navigazione |
@@ -463,9 +464,9 @@ Assicurati che il dispositivo abbia:
 | **permission_handler** | 12.0.1 | Richiesta permessi |
 | **flex_color_scheme** | 8.2.0 | Temi Material 3 |
 | **phosphor_flutter** | 2.1.0 | Icone (600+) |
-| **path_provider** | 2.1.4 | Directory applicazione |
+| **path_provider** | 2.1.4 | Directory app |
 | **shared_preferences** | 2.3.2 | Impostazioni persistenti |
-| **provider** | 6.1.2 | Stato livello widget |
+| **provider** | 6.1.2 | Stato a livello di widget |
 
 ---
 
@@ -473,14 +474,14 @@ Assicurati che il dispositivo abbia:
 
 ### Perché Riverpod?
 - Type-safe senza BuildContext
-- Eccellente gestione async
-- Stato con scope utilizzando `.family`
-- Testabile senza framework mocking
+- Gestione eccezionale dell'async
+- Stato con scope usando `.family`
+- Testabile senza framework di mocking
 
 ### Perché GoRouter?
 - Parametri di route type-safe
-- Supporto deep linking
-- Albero routing dichiarativo
+- Supporto di deep linking
+- Albero di routing dichiarativo
 - Navigazione annidata per tablet
 
 ### Perché FFmpeg?
@@ -489,9 +490,9 @@ Assicurati che il dispositivo abbia:
 - Supporto accelerazione hardware
 - Comunità attiva e aggiornamenti
 
-### Implementazione Specifica Piattaforma
-- File **_mobile.dart** per logica specifica Android
-- Ottimizzato per Android 7.0+ con supporto accelerazione hardware
+### Implementazione Specifica della Piattaforma
+- File **_mobile.dart** per la logica specifica Android
+- Ottimizzato per Android 7.0+ con supporto di accelerazione hardware
 
 ---
 
@@ -499,11 +500,11 @@ Assicurati che il dispositivo abbia:
 
 Le contribuzioni sono benvenute! Per favore:
 
-1. **Fai un fork del repository** e crea un branch di feature
+1. **Fai un fork del repository** e crea un ramo di funzionalità
 2. **Codifica** seguendo i pattern stabiliti (vedi sezione Sviluppo)
 3. **Testa** completamente (unitari, widget, integrazione)
 4. **Formatta** con `flutter format lib/`
-5. **Analizza** con `flutter analyze` (0 avvertimenti)
+5. **Analizza** con `flutter analyze` (0 avvisi)
 6. **Invia PR** con descrizione chiara
 
 ### Aree di Contribuzione
@@ -511,7 +512,7 @@ Le contribuzioni sono benvenute! Per favore:
 - [ ] Algoritmi di compressione aggiuntivi
 - [ ] Più traduzioni linguistiche
 - [ ] Benchmark di performance
-- [ ] Miglioramenti accessibilità
+- [ ] Miglioramenti di accessibilità
 
 ---
 
@@ -519,77 +520,77 @@ Le contribuzioni sono benvenute! Per favore:
 
 D: Quanto tempo impiega tipicamente la compressione video?
 
-R: Il tempo dipende dalle dimensioni del video, dalla risoluzione, dal codec target e dall'hardware del dispositivo. Un video di 100 MB può richiedere 2-5 minuti su un dispositivo di fascia media. L'accelerazione hardware (H.264/H.265 con MediaCodec) riduce significativamente il tempo di elaborazione.
+R: Il tempo dipende dalla dimensione del video, dalla risoluzione, dal codec target e dall'hardware del dispositivo. Un video di 100 MB può impiegare 2-5 minuti su un dispositivo di fascia media. L'accelerazione hardware (H.264/H.265 con MediaCodec) riduce significativamente il tempo di elaborazione.
 
-D: Quale è la differenza tra gli algoritmi di compressione (VP8, VP9, H.264, H.265)?
+D: Qual è la differenza tra gli algoritmi di compressione (VP8, VP9, H.264, H.265)?
 
-R: H.265 fornisce il miglior rapporto di compressione ma codifica più lenta. H.264 bilancia compressione e velocità. VP9 offre ottimizzazione web. VP8 è obsoleto e raramente utilizzato. Scegli H.265 per massima riduzione della dimensione, H.264 per compatibilità e velocità.
+R: H.265 offre il migliore rapporto di compressione ma la codifica è più lenta. H.264 equilibra compressione e velocità. VP9 offre l'ottimizzazione web. VP8 è obsoleto e raramente usato. Scegli H.265 per la massima riduzione di dimensione, H.264 per compatibilità e velocità.
 
 D: Il file video originale verrà eliminato dopo la compressione?
 
-R: No. VCompress salva il video compresso in un nuovo file. L'originale rimane intatto. Puoi abilitare la sovrascrittura nelle Impostazioni se lo desideri.
+R: No. VCompress salva il video compresso in un nuovo file. L'originale rimane intatto. Puoi abilitare la sovrascrittura in Impostazioni se desiderato.
 
 D: Perché il mio dispositivo si riscalda durante la compressione?
 
-R: La compressione video consuma molta CPU/GPU. Su dispositivi più vecchi, l'elaborazione prolungata genera calore. Questo è normale. Riduci la risoluzione target o dividi i video grandi in segmenti per minimizzare la generazione di calore.
+R: La compressione video consuma molto CPU/GPU. Su dispositivi più vecchi, l'elaborazione continua genera calore. È normale. Riduci la risoluzione target o dividi i video di grandi dimensioni in segmenti per minimizzare la generazione di calore.
 
 D: Quali permessi richiede VCompress e perché?
 
-R: Archiviazione: Lettura/scrittura file video. Notifiche: Mostra progresso compressione. Fotocamera/Microfono: Non richiesti; l'app non li utilizza. I permessi vengono richiesti solo quando necessario.
+R: Archiviazione: Leggere/scrivere file video. Notifiche: Visualizzare la progressione della compressione. Fotocamera/Microfono: Non richiesti; l'applicazione non li usa. I permessi vengono richiesti al bisogno.
 
-D: Posso comprimere video in background o mentre uso altre app?
+D: Posso comprimere video in background o usando altre applicazioni?
 
-R: Sì. VCompress esegue la compressione come servizio di background. Puoi navigare, usare altre app o bloccare il dispositivo. Le notifiche di progresso ti mantengono informato.
+R: Sì. VCompress esegue la compressione come servizio in background. Puoi navigare, usare altre applicazioni o bloccare il dispositivo. Le notifiche di progressione ti mantengono informato.
 
-D: Quali formati video sono supportati come input?
+D: Quali formati video sono supportati in input?
 
 R: Qualsiasi formato supportato da FFmpeg: MP4, MKV, AVI, MOV, FLV, WebM, 3GP e altri. I codec devono essere riconosciuti dal decoder video del tuo dispositivo.
 
-D: Quanto spazio libero mi serve per la compressione?
+D: Quanto spazio libero devo avere per la compressione?
 
-R: Lo spazio temporaneo necessario durante la compressione è approssimativamente pari alla dimensione del file di input. La posizione di salvataggio deve avere spazio sufficiente per il file di output. Svuota la cache dell'app se lo spazio è basso.
+R: Lo spazio temporaneo necessario durante la compressione è approssimativamente uguale alla dimensione del file di input. Il percorso di salvataggio deve avere spazio sufficiente per il file di output. Svuota la cache dell'applicazione se lo spazio è basso.
 
 D: Perché la compressione è più lenta su Android 7.0 rispetto alle versioni più recenti?
 
-R: Android 7.0 manca di alcune funzionalità di accelerazione hardware disponibili su 8.0+. La codifica software è più lenta. Aggiorna se possibile, o riduci risoluzione/qualità per elaborazione più veloce.
+R: Android 7.0 manca di alcune funzionalità di accelerazione hardware disponibili su 8.0+. La codifica software è più lenta. Aggiorna se possibile, o riduci la risoluzione/qualità per un'elaborazione più veloce.
 
 D: Cosa devo fare se la compressione fallisce o si blocca?
 
-R: Verifica lo spazio disponibile (>200 MB consigliato). Assicurati che il file video non sia corrotto. Riavvia l'app. Per problemi persistenti, segnala con le informazioni del dispositivo (output `flutter doctor`) e dettagli del video.
+R: Controlla lo spazio disponibile (>200 MB consigliato). Assicurati che il file video non sia corrotto. Riavvia l'applicazione. Per problemi persistenti, segnala con le informazioni del dispositivo (output `flutter doctor`) e i dettagli del video.
 
-D: Posso comprimere in più formati in una sola passata?
+D: Posso comprimere in più formati in una singola sessione?
 
-R: No. Ogni compressione crea un file di output in un formato. Per più output, comprimi più volte con impostazioni diverse.
+R: No. Ogni compressione crea un file di output in un formato. Per più output, comprimi più volte con parametri diversi.
 
 ---
 
 ## Licenza
 
-Licenza MIT - Vedi file LICENSE per i dettagli.
+Licenza MIT - Vedi il file LICENSE per i dettagli.
 
 ---
 
 ## Supporto
 
 ### Documentazione
-- [CLAUDE.md](./CLAUDE.md) - Linee guida sviluppo e decisioni architetturali
+- [CLAUDE.md](./CLAUDE.md) - Linee guida di sviluppo e decisioni architetturali
 - [Documentazione Flutter](https://flutter.dev/docs)
 - [Documentazione FFmpeg](https://ffmpeg.org/documentation.html)
 
 ### Problemi e Feedback
 - Problemi GitHub: [Problemi VCompress](https://github.com/roymejia2217/VCompress/issues)
-- Report Bug: Includi output `flutter doctor` e step per riprodurre
-- Richieste Feature: Descrivi caso d'uso e comportamento atteso
+- Rapporti di Bug: Includi l'output `flutter doctor` e i passaggi per riprodurre
+- Richieste di Funzionalità: Descrivi il caso d'uso e il comportamento atteso
 
-## Cronologia Versioni
+## Cronologia delle Versioni
 
-| Versione | Data | Evidenziamenti |
-|----------|------|-----------|
-| **2.0** | 2025-11-06 | Riprogettazione Material 3, ottimizzazione performance, supporto multilingue |
-| **1.0** | 2025-10-01 | Rilascio iniziale, compressione base, supporto Android |
+| Versione | Data | Modifiche |
+|---------|------|-----------|
+| **2.0** | 2025-11-06 | Ridisegno Material 3, ottimizzazione performance, supporto multilingue |
+| **1.0** | 2025-10-01 | Versione iniziale, compressione di base, supporto Android |
 
 ---
 
 **Costruito con ❤️ usando Flutter**
 
-Domande? Apri un problema o visita il [repository GitHub](https://github.com/roymejia2217/VCompress).
+Hai domande? Apri un problema o visita il [repository GitHub](https://github.com/roymejia2217/VCompress).
