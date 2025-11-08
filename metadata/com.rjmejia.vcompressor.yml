@@ -1,0 +1,27 @@
+Categories:
+  - Multimedia
+License: MIT
+AuthorName: Roy Mejia
+AuthorEmail: roymejia2217@gmail.com
+SourceCode: https://github.com/roymejia2217/VCompress
+IssueTracker: https://github.com/roymejia2217/VCompress/issues
+Changelog: https://github.com/roymejia2217/VCompress/releases
+
+RepoType: git
+Repo: https://github.com/roymejia2217/VCompress.git
+
+Builds:
+  - versionName: '2.0.2'
+    versionCode: 3
+    commit: b27e7c57cd117b6f5e50c6546ba6060b0c96884c
+    subdir: android/app
+    gradle:
+      - yes
+    buildTools: 35.0.0
+    ndk: 27.0.12077973
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+
+CurrentVersion: '2.0.2'
+CurrentVersionCode: 3

@@ -1,0 +1,1 @@
+Potente aplicación Android de compresión de videos con aceleración de hardware

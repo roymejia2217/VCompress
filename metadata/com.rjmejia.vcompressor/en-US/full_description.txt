@@ -1,0 +1,32 @@
+VCompress is a powerful Android video compression application built with Flutter. It provides intelligent video optimization with hardware acceleration, batch processing, and real-time progress tracking.
+
+FEATURES:
+
+Core Compression
+• Multiple Compression Algorithms: VP8, VP9, H.264, H.265 with hardware acceleration
+• Batch Processing: Compress multiple videos simultaneously with intelligent queueing
+• Real-time Progress Tracking: Live progress indicators for import and compression
+• Smart Resolution Selection: Predefined profiles (720p, 1080p, 2K, 4K) with custom options
+• Format Flexibility: Support for MP4, WebM, MKV output containers
+
+Advanced Features
+• Hardware Detection: Automatic device capability detection (CPU cores, RAM, codec support)
+• FFmpeg Integration: Industry-standard video processing with hardware optimization
+• Thumbnail Generation: Automatic video thumbnail extraction with caching
+• Metadata Extraction: Complete video analysis (duration, resolution, codec, fps)
+• File Management: Safe file replacement with backup options
+• Notification System: Real-time compression progress notifications
+
+User Experience
+• Material Design 3: Modern, responsive UI with dynamic color theming
+• Multi-language Support: English, Spanish, French, Italian
+• Localized Settings: Theme mode (light/dark/system), language selection, custom save directory
+• Dark Mode: Full Material 3 dark theme support
+• Accessibility: Semantic labels, keyboard navigation, screen reader support
+
+REQUIREMENTS:
+• Android 7.0+ (API 24+)
+• 2GB RAM minimum
+• 150MB free storage
+
+LICENSE: MIT
