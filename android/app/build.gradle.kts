@@ -74,6 +74,8 @@ flutter {
     source = "../.."
 }
 
+// Exclude Google Play Core library (incompatible with F-Droid)
+// This library is a transitive dependency from Flutter framework
 configurations.all {
     exclude(group = "com.google.android.play", module = "core")
 }
