@@ -138,6 +138,10 @@ class SettingsPage extends ConsumerWidget {
                         value: Locale('fr'),
                         label: 'Français',
                       ),
+                      DropdownMenuEntry<Locale>(
+                        value: Locale('it'),
+                        label: 'Italiano',
+                      ),
                     ],
                     onSelected: (value) {
                       if (value != null) {
