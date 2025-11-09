@@ -9,7 +9,7 @@
     <!-- REMOVIDO: MANAGE_EXTERNAL_STORAGE - No necesario para funcionalidad de video -->
     <application
         android:label="VCompress"
-        android:name="${applicationName}"
+        android:name="android.app.Application"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:enableOnBackInvokedCallback="true">

@@ -94,17 +94,6 @@
     public static <fields>;
 }
 
-# Keep native libraries
--keep class com.vcompressor.vcompressor.MainActivity { *; }
-
-# CRÍTICO: Mantener plugins nativos personalizados
--keep class com.vcompressor.vcompressor.plugins.MediaStoreUriResolverPlugin { *; }
--keep class com.vcompressor.vcompressor.plugins.FileReplacementPlugin { *; }
-
-# Mantener MethodChannels de plugins personalizados
--keep class * extends io.flutter.plugin.common.MethodChannel$MethodCallHandler { *; }
--keep class * implements io.flutter.plugin.common.MethodCallHandler { *; }
-
 # ===============================================
 # SOLUCIÓN KISS: Solo lo esencial para evitar crashes
 # ===============================================
@@ -134,12 +123,6 @@
 -keep class * implements io.flutter.plugin.common.MethodChannel$MethodCallHandler { *; }
 -keepclassmembers class * {
     public void onMethodCall(io.flutter.plugin.common.MethodCall, io.flutter.plugin.common.MethodChannel$Result);
-}
-
-# Custom plugins - REQUERIDO
--keep class com.vcompressor.vcompressor.plugins.** { *; }
--keepclassmembers class com.vcompressor.vcompressor.plugins.** {
-    public <methods>;
 }
 
 # Video Thumbnail Plugin

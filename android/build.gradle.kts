@@ -5,8 +5,13 @@ allprojects {
     }
 
     configurations.all {
+        // ⚠️ EXCLUSIÓN AGRESIVA DE GOOGLE PLAY CORE
+        // Las dependencias transitivas pueden traer Play Core de varias formas
+        exclude(group = "com.google.android.play")
         exclude(group = "com.google.android.play", module = "core")
         exclude(group = "com.google.android.play", module = "core-ktx")
+        exclude(group = "com.google.android.play", module = "play-core")
+        exclude(group = "com.google.android.play", module = "play-services-basement")
     }
 }
 
