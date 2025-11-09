@@ -58,7 +58,7 @@ android {
             // Configure proper release signing
             // Create keystore with: keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
             signingConfig = signingConfigs.getByName("release")
-            // Disable minification - it breaks the app. Use F-Droid scandelete instead.
+            // Disable minification - breaks custom plugins
             isMinifyEnabled = false
             isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -72,10 +72,4 @@ android {
 
 flutter {
     source = "../.."
-}
-
-// Exclude Google Play Core library (incompatible with F-Droid)
-// This library is a transitive dependency from Flutter framework
-configurations.all {
-    exclude(group = "com.google.android.play", module = "core")
 }
