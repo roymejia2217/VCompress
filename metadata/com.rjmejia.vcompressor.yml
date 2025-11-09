@@ -11,15 +11,19 @@ RepoType: git
 Repo: https://github.com/roymejia2217/VCompress.git
 
 Builds:
-  - versionName: 2.0.2
-    versionCode: 3
-    commit: b27e7c57cd117b6f5e50c6546ba6060b0c96884c
+  - versionName: 2.0.3
+    versionCode: 4
+    commit: a5edac2
     subdir: android/app
     gradle:
       - yes
     ndk: 27.0.12077973
+    srclibs:
+      - flutter=git@github.com:flutter/flutter.git@3.32.8
+    prebuild: |
+      echo "flutter.sdk=$$flutter$$" >> $$android$$/local.properties
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 2.0.2
-CurrentVersionCode: 3
+CurrentVersion: 2.0.3
+CurrentVersionCode: 4
