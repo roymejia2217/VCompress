@@ -3,6 +3,11 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    configurations.all {
+        exclude(group = "com.google.android.play", module = "core")
+        exclude(group = "com.google.android.play", module = "core-ktx")
+    }
 }
 
 val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()
