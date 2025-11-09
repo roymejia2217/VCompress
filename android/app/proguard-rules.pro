@@ -37,9 +37,43 @@
     public static void registerWith(io.flutter.embedding.engine.FlutterEngine);
 }
 
-# FFmpeg Kit specific rules
+# FFmpeg Kit specific rules - CRÍTICO para EventChannel en release
 -keep class com.arthenica.ffmpegkit.** { *; }
 -keep class com.arthenica.ffmpegkit.react.** { *; }
+
+# FFmpeg Kit Flutter Plugin - NOMBRE CORRECTO: com.antonkarpenko.ffmpegkit
+-keep class com.antonkarpenko.ffmpegkit.** { *; }
+-keep class com.antonkarpenko.ffmpegkit.FFmpegKitFlutterPlugin { *; }
+-keep class com.antonkarpenko.ffmpegkit.FFmpegKitFlutterPlugin$* { *; }
+
+# Keep all FlutterPlugin implementations
+-keep class * implements io.flutter.embedding.engine.plugins.FlutterPlugin { *; }
+-keep class * extends io.flutter.embedding.engine.plugins.FlutterPlugin { *; }
+-keepclassmembers class * implements io.flutter.embedding.engine.plugins.FlutterPlugin { *; }
+-keepclassmembers class * extends io.flutter.embedding.engine.plugins.FlutterPlugin { *; }
+
+# FFmpeg Kit Flutter event handler methods - CRÍTICO
+-keepclassmembers class com.antonkarpenko.ffmpegkit.FFmpegKitFlutterPlugin {
+    public void onAttachedToEngine(io.flutter.embedding.engine.FlutterEngine);
+    public void onDetachedFromEngine(io.flutter.embedding.engine.FlutterEngine);
+    public void onMethodCall(io.flutter.plugin.common.MethodCall, io.flutter.plugin.common.MethodChannel$Result);
+    public void onEventChannel(io.flutter.plugin.common.EventChannel, io.flutter.plugin.common.EventChannel$EventSink);
+}
+
+# Keep all listener/callback interfaces for FFmpeg
+-keep interface com.arthenica.ffmpegkit.** { *; }
+-keep class * implements com.arthenica.ffmpegkit.FFmpegSessionCompleteCallback { *; }
+-keep class * implements com.arthenica.ffmpegkit.LogCallback { *; }
+-keep class * implements com.arthenica.ffmpegkit.StatisticsCallback { *; }
+
+# FFmpeg Kit native libraries
+-keepclasseswithmembernames class com.arthenica.ffmpegkit.** {
+    native <methods>;
+}
+
+-keepclasseswithmembernames class com.antonkarpenko.ffmpegkit.** {
+    native <methods>;
+}
 
 # file_picker package rules
 -keep class com.mr.flutter.plugin.filepicker.** { *; }
@@ -98,16 +132,22 @@
 # SOLUCIÓN KISS: Solo lo esencial para evitar crashes
 # ===============================================
 
-# FFmpeg Kit Flutter - CAUSA PRINCIPAL DEL CRASH
--keep class com.arthenica.ffmpegkit.** { *; }
--keep class com.arthenica.mobileffmpeg.** { *; }
--dontwarn com.arthenica.ffmpegkit.**
--dontwarn org.apache.tika.**
-
-# FFmpeg native methods - CRÍTICO
+# FFmpeg Kit Flutter - ProGuard rules para minificación con dynamic invocation
+# Patrón wildcard para máxima compatibilidad con actualizaciones futuras
 -keepclassmembers class com.arthenica.ffmpegkit.** {
+    public *** get*();
+    public void set*(***);
+    public boolean is*();
+    public static ** valueOf(java.lang.String);
+    public static ** values();
+    public int getState();
+    public java.lang.Integer getReturnCode();
+    public java.lang.String getAllLogsAsString();
     native <methods>;
 }
+
+-dontwarn com.arthenica.ffmpegkit.**
+-dontwarn org.apache.tika.**
 
 # Flutter Engine - BASE REQUERIDA
 -keep class io.flutter.app.** { *; }
@@ -151,6 +191,31 @@
 -keep class android.content.Context { *; }
 -keep class android.app.Activity { *; }
 -keep class android.content.ContextWrapper { *; }
+
+# CRÍTICO: Custom native plugins para MediaStore y FileReplacement
+# Estos plugins son registrados en MainActivity y deben preservarse completamente
+-keep class com.rjmejia.vcompressor.plugins.** { *; }
+-keep class com.rjmejia.vcompressor.MainActivity { *; }
+
+# Asegurar que los métodos de los plugins no sean obfuscados
+-keepclassmembers class com.rjmejia.vcompressor.plugins.MediaStoreUriResolverPlugin {
+    public void onMethodCall(io.flutter.plugin.common.MethodCall, io.flutter.plugin.common.MethodChannel$Result);
+    public void onAttachedToEngine(io.flutter.embedding.engine.plugins.FlutterPlugin$FlutterPluginBinding);
+    public void onDetachedFromEngine(io.flutter.embedding.engine.plugins.FlutterPlugin$FlutterPluginBinding);
+    private void resolvePathFromUri(java.lang.String, io.flutter.plugin.common.MethodChannel$Result);
+    private void resolveUriFromPath(java.lang.String, io.flutter.plugin.common.MethodChannel$Result);
+}
+
+-keepclassmembers class com.rjmejia.vcompressor.plugins.FileReplacementPlugin {
+    public void onMethodCall(io.flutter.plugin.common.MethodCall, io.flutter.plugin.common.MethodChannel$Result);
+    public void onAttachedToEngine(io.flutter.embedding.engine.plugins.FlutterPlugin$FlutterPluginBinding);
+    public void onDetachedFromEngine(io.flutter.embedding.engine.plugins.FlutterPlugin$FlutterPluginBinding);
+}
+
+# ContentResolver y MediaStore - CRÍTICO para file selection
+-keep class android.content.ContentResolver { *; }
+-keep class android.provider.MediaStore** { *; }
+-keep class android.provider.DocumentsContract { *; }
 
 # Google Play Core rules - REMOVE for F-Droid compatibility
 # These classes are only needed for Google Play Store dynamic delivery

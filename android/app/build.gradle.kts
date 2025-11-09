@@ -58,8 +58,8 @@ android {
             // Configure proper release signing
             // Create keystore with: keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
             signingConfig = signingConfigs.getByName("release")
-            // Disable minification - breaks custom plugins
-            isMinifyEnabled = false
+            // Enable minification with ProGuard rules for FFmpeg Kit compatibility
+            isMinifyEnabled = true
             isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
