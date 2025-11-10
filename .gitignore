@@ -58,6 +58,7 @@ node_modules/
 /windows/
 /macos/
 /ios/
+/linux/
 
 # Android builds
 /android/app/debug
