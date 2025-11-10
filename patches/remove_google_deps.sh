@@ -3,13 +3,35 @@ set -e
 
 echo "🧹 Removing Google Play dependencies..."
 
-# Remover de archivos Java/Kotlin
-find . -type f \( -name "*.java" -o -name "*.kt" \) \
-  -exec grep -l 'com\.google\.android\.play' {} \; \
-  -exec sed -i '/com\.google\.android\.play/d' {} \; 2>/dev/null || true
+# 1. Limpia pubspec.yaml
+sed -i '/google_mobile_ads/d' pubspec.yaml
+sed -i '/firebase/d' pubspec.yaml
 
-# Remover de build.gradle
-find . -type f -name "build.gradle*" \
-  -exec sed -i '/com\.google\.android\.gms/d' {} \; 2>/dev/null || true
+# 2. Limpia android/app/build.gradle.kts
+sed -i '/com.google.gms/d' android/app/build.gradle.kts
+sed -i '/com.google.firebase/d' android/app/build.gradle.kts
+
+# 3. CRÍTICO: Remueve Play Core de ffmpeg_kit después de pub get
+# Esto debe ejecutarse DESPUÉS de flutter pub get
+cleanup_ffmpeg() {
+    if [ -d ".pub-cache/hosted/pub.dev/ffmpeg_kit_flutter_new-3.2.0" ]; then
+        echo "🔧 Cleaning Play Core from ffmpeg_kit..."
+        
+        # Remueve imports de Play Core
+        find .pub-cache/hosted/pub.dev/ffmpeg_kit_flutter_new-3.2.0 \
+            -name "*.java" -o -name "*.kt" | \
+            xargs sed -i '/import com\.google\.android\.play/d'
+        
+        # Remueve referencias a Play Core en código
+        find .pub-cache/hosted/pub.dev/ffmpeg_kit_flutter_new-3.2.0 \
+            -name "*.java" -o -name "*.kt" | \
+            xargs sed -i 's/SplitInstall[A-Za-z]*//g'
+        
+        # Limpia build.gradle de ffmpeg_kit
+        sed -i '/com.google.android.play/d' \
+            .pub-cache/hosted/pub.dev/ffmpeg_kit_flutter_new-3.2.0/android/build.gradle
+    fi
+}
 
 echo "✅ Google dependencies removed"
+echo "⚠️  Run cleanup_ffmpeg after flutter pub get"
