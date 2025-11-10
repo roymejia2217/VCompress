@@ -217,12 +217,6 @@
 -keep class android.provider.MediaStore** { *; }
 -keep class android.provider.DocumentsContract { *; }
 
-# Google Play Core rules - REMOVE for F-Droid compatibility
-# These classes are only needed for Google Play Store dynamic delivery
-# For F-Droid builds, remove them completely using -assumenosideeffects
--assumenosideeffects class com.google.android.play.core.** {
-    public <methods>;
-    public <fields>;
-}
--dontwarn com.google.android.play.core.**
+# Google Play Core rules - handled by F-Droid scandelete directive
+# See fdroiddata metadata for F-Droid specific handling
 

@@ -70,17 +70,6 @@ android {
     }
 }
 
-configurations.all {
-    // ⚠️ EXCLUSIÓN AGRESIVA DE GOOGLE PLAY CORE
-    // Las dependencias transitivas de ffmpeg_kit_flutter_new (u otros plugins)
-    // pueden traer Play Core. Esto excluye CUALQUIER dependencia que sea Play Core.
-    exclude(group = "com.google.android.play")
-    exclude(group = "com.google.android.play", module = "core")
-    exclude(group = "com.google.android.play", module = "core-ktx")
-    exclude(group = "com.google.android.play", module = "play-core")
-    exclude(group = "com.google.android.play", module = "play-services-basement")
-}
-
 flutter {
     source = "../.."
 }
