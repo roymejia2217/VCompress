@@ -123,14 +123,14 @@ VCompress offre un'interfaccia intuitiva in Material Design 3 che guida gli uten
 Gestione dello Stato:     Riverpod 2.6.1 (FutureProvider, StateNotifier)
 Navigazione:             GoRouter 16.2.0 (routing type-safe)
 Framework UI:            Flutter Material 3
-Elaborazione Video:      FFmpeg (ffmpeg_kit_flutter_new 3.2.0)
+Elaborazione Video:      FFmpeg (ffmpeg_kit_flutter_new 4.1.0)
 Archiviazione:           SharedPreferences + Path Provider
-Icone:                   Phosphor Flutter
-Tematizzazione:          Flex Color Scheme 8.2.0
+Icone:                   Phosphor Flutter 2.1.0
+Tematizzazione:          Flex Color Scheme 8.3.1
 Localizzazione:          Flutter Intl (file .arb)
 Permessi:                Permission Handler 12.0.1
-Selezione File:          File Picker 10.3.2
-Miniature:               Video Thumbnail 0.5.3
+Selezione File:          File Picker 10.3.3
+Miniature:               Video Thumbnail 0.5.6
 ```
 
 ### Struttura del Progetto
@@ -458,15 +458,17 @@ Assicurati che il dispositivo abbia:
 | **flutter** | 3.32.8 | Framework UI |
 | **flutter_riverpod** | 2.6.1 | Gestione dello stato |
 | **go_router** | 16.2.0 | Navigazione |
-| **ffmpeg_kit_flutter_new** | 3.2.0 | Elaborazione video |
-| **video_thumbnail** | 0.5.3 | Generazione miniature |
-| **file_picker** | 10.3.2 | Selezione file |
+| **ffmpeg_kit_flutter_new** | 4.1.0 | Elaborazione video |
+| **video_thumbnail** | 0.5.6 | Generazione miniature |
+| **file_picker** | 10.3.3 | Selezione file |
 | **permission_handler** | 12.0.1 | Richiesta permessi |
-| **flex_color_scheme** | 8.2.0 | Temi Material 3 |
+| **flex_color_scheme** | 8.3.1 | Temi Material 3 |
 | **phosphor_flutter** | 2.1.0 | Icone (600+) |
-| **path_provider** | 2.1.4 | Directory app |
-| **shared_preferences** | 2.3.2 | Impostazioni persistenti |
-| **provider** | 6.1.2 | Stato a livello di widget |
+| **path_provider** | 2.1.5 | Directory app |
+| **shared_preferences** | 2.5.3 | Impostazioni persistenti |
+| **crypto** | 3.0.7 | Utilità crittografiche |
+| **package_info_plus** | 8.0.2 | Informazioni sul pacchetto |
+| **logger** | 2.6.2 | Logging |
 
 ---
 

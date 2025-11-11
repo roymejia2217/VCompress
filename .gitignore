@@ -41,10 +41,13 @@ app.*.map.json
 .cursor/
 .claude/
 .claude-context.db
+.qwen/
+qwen_context.db
 test_videos/
 
 # Configuration files
 CLAUDE.md
+qwen.md
 .env
 key.properties
 

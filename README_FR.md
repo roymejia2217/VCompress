@@ -123,14 +123,14 @@ VCompress offre une interface intuitive en Material Design 3 qui guide les utili
 Gestion d'État:      Riverpod 2.6.1 (FutureProvider, StateNotifier)
 Navigation:          GoRouter 16.2.0 (routage type-safe)
 Framework UI:        Flutter Material 3
-Traitement Vidéo:    FFmpeg (ffmpeg_kit_flutter_new 3.2.0)
+Traitement Vidéo:    FFmpeg (ffmpeg_kit_flutter_new 4.1.0)
 Stockage:            SharedPreferences + Path Provider
-Icônes:              Phosphor Flutter
-Thématisation:       Flex Color Scheme 8.2.0
+Icônes:              Phosphor Flutter 2.1.0
+Thématisation:       Flex Color Scheme 8.3.1
 Localisation:        Flutter Intl (fichiers .arb)
 Permissions:         Permission Handler 12.0.1
-Sélection Fichiers:  File Picker 10.3.2
-Miniatures:          Video Thumbnail 0.5.3
+Sélection Fichiers:  File Picker 10.3.3
+Miniatures:          Video Thumbnail 0.5.6
 ```
 
 ### Structure du Projet
@@ -457,15 +457,17 @@ Assurez-vous que l'appareil a:
 | **flutter** | 3.32.8 | Framework UI |
 | **flutter_riverpod** | 2.6.1 | Gestion d'état |
 | **go_router** | 16.2.0 | Navigation |
-| **ffmpeg_kit_flutter_new** | 3.2.0 | Traitement vidéo |
-| **video_thumbnail** | 0.5.3 | Génération de miniatures |
-| **file_picker** | 10.3.2 | Sélection de fichiers |
+| **ffmpeg_kit_flutter_new** | 4.1.0 | Traitement vidéo |
+| **video_thumbnail** | 0.5.6 | Génération de miniatures |
+| **file_picker** | 10.3.3 | Sélection de fichiers |
 | **permission_handler** | 12.0.1 | Demande de permissions |
-| **flex_color_scheme** | 8.2.0 | Thèmes Material 3 |
+| **flex_color_scheme** | 8.3.1 | Thèmes Material 3 |
 | **phosphor_flutter** | 2.1.0 | Icônes (600+) |
-| **path_provider** | 2.1.4 | Répertoires d'application |
-| **shared_preferences** | 2.3.2 | Paramètres persistants |
-| **provider** | 6.1.2 | État au niveau du widget |
+| **path_provider** | 2.1.5 | Répertoires d'application |
+| **shared_preferences** | 2.5.3 | Paramètres persistants |
+| **crypto** | 3.0.7 | Utilitaires cryptographiques |
+| **package_info_plus** | 8.0.2 | Informations sur le package |
+| **logger** | 2.6.2 | Journalisation |
 
 ---
 

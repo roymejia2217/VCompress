@@ -123,14 +123,14 @@ VCompress presenta una interfaz intuitiva en Material Design 3 que guía a los u
 Gestión de Estado:   Riverpod 2.6.1 (FutureProvider, StateNotifier)
 Navegación:          GoRouter 16.2.0 (enrutamiento type-safe)
 Framework de UI:     Flutter Material 3
-Procesamiento Video: FFmpeg (ffmpeg_kit_flutter_new 3.2.0)
+Procesamiento Video: FFmpeg (ffmpeg_kit_flutter_new 4.1.0)
 Almacenamiento:      SharedPreferences + Path Provider
-Iconos:              Phosphor Flutter
-Temas:               Flex Color Scheme 8.2.0
+Iconos:              Phosphor Flutter 2.1.0
+Temas:               Flex Color Scheme 8.3.1
 Localización:        Flutter Intl (archivos .arb)
 Permisos:            Permission Handler 12.0.1
-Selección Archivos:  File Picker 10.3.2
-Miniaturas:          Video Thumbnail 0.5.3
+Selección Archivos:  File Picker 10.3.3
+Miniaturas:          Video Thumbnail 0.5.6
 ```
 
 ### Estructura del Proyecto
@@ -457,15 +457,17 @@ Asegúrate de que el dispositivo tenga:
 | **flutter** | 3.32.8 | Framework de UI |
 | **flutter_riverpod** | 2.6.1 | Gestión de estado |
 | **go_router** | 16.2.0 | Navegación |
-| **ffmpeg_kit_flutter_new** | 3.2.0 | Procesamiento de video |
-| **video_thumbnail** | 0.5.3 | Generación de miniaturas |
-| **file_picker** | 10.3.2 | Selección de archivos |
+| **ffmpeg_kit_flutter_new** | 4.1.0 | Procesamiento de video |
+| **video_thumbnail** | 0.5.6 | Generación de miniaturas |
+| **file_picker** | 10.3.3 | Selección de archivos |
 | **permission_handler** | 12.0.1 | Solicitud de permisos |
-| **flex_color_scheme** | 8.2.0 | Temas Material 3 |
+| **flex_color_scheme** | 8.3.1 | Temas Material 3 |
 | **phosphor_flutter** | 2.1.0 | Iconos (600+) |
-| **path_provider** | 2.1.4 | Directorios de aplicación |
-| **shared_preferences** | 2.3.2 | Configuración persistente |
-| **provider** | 6.1.2 | Estado a nivel de widget |
+| **path_provider** | 2.1.5 | Directorios de aplicación |
+| **shared_preferences** | 2.5.3 | Configuración persistente |
+| **crypto** | 3.0.7 | Utilidades criptográficas |
+| **package_info_plus** | 8.0.2 | Información del paquete |
+| **logger** | 2.6.2 | Registro |
 
 ---
 

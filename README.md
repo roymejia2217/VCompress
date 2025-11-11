@@ -123,14 +123,14 @@ VCompress features an intuitive Material Design 3 interface that guides users th
 State Management:    Riverpod 2.6.1 (FutureProvider, StateNotifier)
 Navigation:         GoRouter 16.2.0 (type-safe routing)
 UI Framework:       Flutter Material 3
-Video Processing:   FFmpeg (ffmpeg_kit_flutter_new 3.2.0)
+Video Processing:   FFmpeg (ffmpeg_kit_flutter_new 4.1.0)
 Storage:            SharedPreferences + Path Provider
-Icons:              Phosphor Flutter
-Theming:            Flex Color Scheme 8.2.0
+Icons:              Phosphor Flutter 2.1.0
+Theming:            Flex Color Scheme 8.3.1
 Localization:       Flutter Intl (.arb files)
 Permissions:        Permission Handler 12.0.1
-File Picking:       File Picker 10.3.2
-Thumbnails:         Video Thumbnail 0.5.3
+File Picking:       File Picker 10.3.3
+Thumbnails:         Video Thumbnail 0.5.6
 ```
 
 ### Project Structure
@@ -584,15 +584,17 @@ Ensure device has:
 | **flutter** | 3.32.8 | UI framework |
 | **flutter_riverpod** | 2.6.1 | State management |
 | **go_router** | 16.2.0 | Navigation |
-| **ffmpeg_kit_flutter_new** | 3.2.0 | Video processing |
-| **video_thumbnail** | 0.5.3 | Thumbnail generation |
-| **file_picker** | 10.3.2 | File selection |
+| **ffmpeg_kit_flutter_new** | 4.1.0 | Video processing |
+| **video_thumbnail** | 0.5.6 | Thumbnail generation |
+| **file_picker** | 10.3.3 | File selection |
 | **permission_handler** | 12.0.1 | Permission requests |
-| **flex_color_scheme** | 8.2.0 | Material 3 theming |
+| **flex_color_scheme** | 8.3.1 | Material 3 theming |
 | **phosphor_flutter** | 2.1.0 | Icons (600+) |
-| **path_provider** | 2.1.4 | App directories |
-| **shared_preferences** | 2.3.2 | Persistent settings |
-| **provider** | 6.1.2 | Widget-level state |
+| **path_provider** | 2.1.5 | App directories |
+| **shared_preferences** | 2.5.3 | Persistent settings |
+| **crypto** | 3.0.7 | Cryptographic utilities |
+| **package_info_plus** | 8.0.2 | Package information |
+| **logger** | 2.6.2 | Logging |
 
 ### Dev Dependencies
 
