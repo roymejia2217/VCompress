@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -7,6 +10,10 @@ plugins {
 
 android {
     namespace = "com.rjmejia.vcompressor"
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
     compileSdk = flutter.compileSdkVersion
     // Fijamos NDK 27 para compatibilidad con varios plugins (ffmpeg_kit, file_picker, etc.)
     ndkVersion = "27.0.12077973"
@@ -39,10 +46,22 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("upload-keystore.jks")
-            storePassword = "android"
-            keyAlias = "upload"
-            keyPassword = "android"
+            val keystoreProperties = Properties()
+            val keystorePropertiesFile = rootProject.file("key.properties")
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            } else {
+                // Fallback to debug signing if no key.properties found (e.g. F-Droid build or local test)
+                val debugConfig = signingConfigs.getByName("debug")
+                storeFile = debugConfig.storeFile
+                storePassword = debugConfig.storePassword
+                keyAlias = debugConfig.keyAlias
+                keyPassword = debugConfig.keyPassword
+            }
         }
     }
 
@@ -55,8 +74,6 @@ android {
 
     buildTypes {
         release {
-            // Configure proper release signing
-            // Create keystore with: keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
             signingConfig = signingConfigs.getByName("release")
             // Enable minification with ProGuard rules for FFmpeg Kit compatibility
             isMinifyEnabled = true
