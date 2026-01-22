@@ -587,8 +587,12 @@ Licencia MIT - Ver archivo LICENSE para detalles.
 
 | Versión | Fecha | Destacados |
 |---------|-------|-----------|
-| **2.0** | 2025-11-06 | Rediseño Material 3, optimización de rendimiento, soporte multiidioma |
-| **1.0** | 2025-10-01 | Lanzamiento inicial, compresión básica, soporte Android |
+| **2.0.5** | 2026-01-21 | Compatibilidad con F-Droid (builds reproducibles), DependencyInfoBlock deshabilitado |
+| **2.0.4** | 2025-11-11 | Actualización de dependencias, mejoras en reglas ProGuard para F-Droid |
+| **2.0.3** | 2025-11-09 | Minificación ProGuard habilitada, correcciones de configuración FFmpeg Kit |
+| **2.0.2** | 2025-11-08 | Añadida localización completa al Italiano (it) |
+| **2.0.1** | 2025-11-07 | Lanzamiento de mantenimiento, correcciones de consistencia en localización |
+| **2.0.0** | 2025-11-07 | Lanzamiento Inicial, Material Design 3, Multiidioma, Aceleración por Hardware |
 
 ---
 
