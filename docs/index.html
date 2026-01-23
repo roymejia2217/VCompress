@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VCompress - Compresor de Video Inteligente</title>
+    <meta name="description" content="Aplicación inteligente de compresión de video para Android con aceleración de hardware.">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="container">
+        <ul>
+            <li><strong>VCompress</strong></li>
+        </ul>
+        <ul>
+            <li>
+                <a href="#" id="themeToggle" data-theme-switcher="toggle">
+                    <i class="ph ph-moon" id="themeIcon"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <header class="container">
+        <img src="https://raw.githubusercontent.com/roymejia2217/VCompress/master/android/app/src/main/play_store_512.png" alt="VCompress Logo" class="logo">
+        <hgroup>
+            <h1>VCompress</h1>
+            <p>Compresor de video inteligente para Android con Material Design 3</p>
+        </hgroup>
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+            <a href="https://github.com/roymejia2217/VCompress" target="_blank" role="button" class="contrast">
+                <i class="ph ph-github-logo"></i> Ver en GitHub
+            </a>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Sección de Última Versión -->
+        <section id="latest-release-section">
+            <h2><i class="ph ph-star"></i> Último Lanzamiento</h2>
+            <article id="latest-release-card" aria-busy="true">
+                Cargando información del lanzamiento...
+            </article>
+        </section>
+
+        <!-- Sección de Características -->
+        <section id="features-section">
+            <h2><i class="ph ph-list-checks"></i> Características Principales</h2>
+            
+            <article>
+                <details name="features" open>
+                    <summary><i class="ph ph-faders"></i> Compresión Principal</summary>
+                    <ul>
+                        <li><strong>Múltiples algoritmos:</strong> VP8, VP9, H.264, H.265 con aceleración por hardware.</li>
+                        <li><strong>Procesamiento por lotes:</strong> Compresión simultánea con cola inteligente.</li>
+                        <li><strong>Seguimiento en vivo:</strong> Indicadores de progreso en tiempo real para todas las operaciones.</li>
+                        <li><strong>Resolución inteligente:</strong> Perfiles predefinidos (720p, 1080p, 2K, 4K) y opciones personalizadas.</li>
+                        <li><strong>Flexibilidad de formatos:</strong> Soporte para contenedores MP4, WebM y MKV.</li>
+                    </ul>
+                </details>
+
+                <details name="features">
+                    <summary><i class="ph ph-cpu"></i> Características Avanzadas</summary>
+                    <ul>
+                        <li><strong>Detección de Hardware:</strong> Identificación automática de capacidades (CPU, RAM, Codecs).</li>
+                        <li><strong>Motor FFmpeg:</strong> Procesamiento estándar de la industria con <code>ffmpeg_kit_flutter_new</code>.</li>
+                        <li><strong>Gestión de Medios:</strong> Generación de miniaturas y extracción completa de metadatos.</li>
+                        <li><strong>Gestión de Archivos:</strong> Reemplazo seguro, copias de seguridad y resolución de URI.</li>
+                        <li><strong>Notificaciones:</strong> Avisos de progreso en tiempo real en la barra de estado.</li>
+                    </ul>
+                </details>
+
+                <details name="features">
+                    <summary><i class="ph ph-paint-brush-broad"></i> Experiencia de Usuario</summary>
+                    <ul>
+                        <li><strong>Material Design 3:</strong> Interfaz moderna y responsiva con temas dinámicos.</li>
+                        <li><strong>Soporte Multiidioma:</strong> Disponible en Español, Inglés y Francés.</li>
+                        <li><strong>Personalización:</strong> Selector de tema (Claro/Oscuro/Sistema) y directorio de guardado.</li>
+                        <li><strong>Accesibilidad:</strong> Navegación por teclado y soporte para lectores de pantalla.</li>
+                    </ul>
+                </details>
+            </article>
+        </section>
+
+        <!-- Sección de Galería -->
+        <section id="gallery-section">
+            <h2><i class="ph ph-images"></i> Galería</h2>
+            <article>
+                <div class="grid">
+                    <figure>
+                        <img src="https://raw.githubusercontent.com/roymejia2217/VCompress/master/docs/mockups/home_page_video.webp" alt="Pantalla de Inicio con Video">
+                        <figcaption>Inicio</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="https://raw.githubusercontent.com/roymejia2217/VCompress/master/docs/mockups/videoconfigmodal.png" alt="Configuración de Compresión">
+                        <figcaption>Configuración</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="https://raw.githubusercontent.com/roymejia2217/VCompress/master/docs/mockups/process_page_video_compressing.png" alt="Proceso de Compresión">
+                        <figcaption>Comprimiendo</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="https://raw.githubusercontent.com/roymejia2217/VCompress/master/docs/mockups/video_result.webp" alt="Resultado de la Compresión">
+                        <figcaption>Resultado</figcaption>
+                    </figure>
+                </div>
+            </article>
+        </section>
+
+        <!-- Sección de Historial -->
+        <section id="history-section">
+            <h2><i class="ph ph-clock-counter-clockwise"></i> Historial de Versiones</h2>
+            <div id="release-history">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="container">
+        <small>
+            Desarrollado por <a href="https://github.com/roymejia2217">Roy Mejia</a>. 
+            Código fuente bajo licencia del repositorio.
+        </small>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

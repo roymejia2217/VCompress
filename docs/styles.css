@@ -1,0 +1,29 @@
+[data-theme="light"] {
+    --pico-primary: #7c3aed;
+    --pico-primary-background: #7c3aed;
+    --pico-primary-hover: #6d28d9;
+    --pico-primary-focus: rgba(124, 58, 237, 0.5);
+}
+[data-theme="dark"] {
+    --pico-background-color: #0f0f0f;
+    --pico-color: #e0e0e0;
+    --pico-primary: #a78bfa;
+    --pico-primary-background: #7c3aed;
+    --pico-card-background-color: #1a1a1a;
+    --pico-form-element-background-color: #2a2a2a;
+    --pico-switch-checked-background-color: #7c3aed;
+}
+
+/* Custom tweaks strictly for layout spacing, keeping Pico semantics */
+header { padding-top: 2rem; padding-bottom: 2rem; text-align: center; }
+.logo { width: 120px; height: 120px; border-radius: 50%; margin-bottom: 1rem; object-fit: cover; }
+.release-meta { font-size: 0.8rem; opacity: 0.8; margin-bottom: 1rem; }
+.download-btn { width: 100%; margin-top: 1rem; }
+details summary { cursor: pointer; }
+.error-message { color: var(--pico-del-color); text-align: center; }
+#gallery-section figcaption {
+    color: var(--pico-h2-color, var(--pico-color));
+    font-weight: bold;
+    text-align: center;
+    margin-top: 0.5rem;
+}
