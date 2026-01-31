@@ -36,7 +36,38 @@ class AppLocalizationsEs extends AppLocalizations {
   String get french => 'Francés';
 
   @override
+  String get italian => 'Italiano';
+
+  @override
   String get storage => 'Almacenamiento';
+
+  @override
+  String get loadingSettings => 'Cargando configuración...';
+
+  @override
+  String get errorLoadingSettings => 'Error al cargar configuración';
+
+  @override
+  String get retry => 'Reintentar';
+
+  @override
+  String saveFolderSemantics(String path) {
+    return 'Carpeta de guardado configurada como $path';
+  }
+
+  @override
+  String get changeFolderSemantics => 'Cambiar carpeta de guardado';
+
+  @override
+  String get changeFolderHint => 'Activa para seleccionar nueva carpeta';
+
+  @override
+  String invalidFilesCount(int count) {
+    return 'Archivos no válidos: $count';
+  }
+
+  @override
+  String get view => 'Ver';
 
   @override
   String get light => 'Claro';
@@ -320,6 +351,15 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get webm => 'WebM';
+
+  @override
+  String get videoCodec => 'Códec de video';
+
+  @override
+  String get h264 => 'H.264 (AVC)';
+
+  @override
+  String get h265 => 'H.265 (HEVC)';
 
   @override
   String selected(int count) {

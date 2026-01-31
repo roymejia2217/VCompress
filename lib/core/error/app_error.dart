@@ -14,6 +14,7 @@ enum AppErrorType {
   cacheRegeneration,
   originalFileNotFound,
   dependencyNotAvailable,
+  cancelled,
   unknown,
 }
 
@@ -34,6 +35,15 @@ class AppError {
     this.originalError,
     this.stackTrace,
   });
+
+  /// Factory constructor para operación cancelada
+  factory AppError.cancelled() {
+    return const AppError(
+      type: AppErrorType.cancelled,
+      message: 'Operación cancelada por el usuario',
+      details: 'El procesamiento fue detenido manualmente',
+    );
+  }
 
   /// Factory constructor para errores de archivo no encontrado
   factory AppError.fileNotFound(String filePath) {
@@ -206,6 +216,8 @@ class AppError {
         return 'El archivo original no se encontró. Verifique que el archivo existe.';
       case AppErrorType.dependencyNotAvailable:
         return 'Una dependencia crítica no está disponible. Reinicie la aplicación.';
+      case AppErrorType.cancelled:
+        return 'Operación cancelada.';
       case AppErrorType.unknown:
         return 'Ocurrió un error inesperado. Intente nuevamente.';
     }
@@ -238,6 +250,8 @@ class AppError {
         return '[FILE]';
       case AppErrorType.dependencyNotAvailable:
         return '[DEPENDENCY]';
+      case AppErrorType.cancelled:
+        return '[CANCEL]';
       case AppErrorType.unknown:
         return '[UNKNOWN]';
     }
@@ -261,6 +275,8 @@ class AppError {
       case AppErrorType.dependencyNotAvailable:
       case AppErrorType.unknown:
         return false;
+      case AppErrorType.cancelled:
+        return true;
     }
   }
 

@@ -438,6 +438,21 @@
     "description": "Format de sortie : WebM"
   },
 
+  "videoCodec": "Codec vidéo",
+  "@videoCodec": {
+    "description": "Étiquette pour le sélecteur de codec vidéo"
+  },
+
+  "h264": "H.264 (AVC)",
+  "@h264": {
+    "description": "Codec vidéo : H.264"
+  },
+
+  "h265": "H.265 (HEVC)",
+  "@h265": {
+    "description": "Codec vidéo : H.265"
+  },
+
   "selected": "{count,plural, =0{Aucun élément sélectionné} =1{1 élément sélectionné} other{{count} éléments sélectionnés}}",
   "@selected": {
     "description": "Nombre d'éléments sélectionnés message",

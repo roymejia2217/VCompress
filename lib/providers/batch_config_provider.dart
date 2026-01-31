@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vcompressor/models/video_task.dart';
 import 'package:vcompressor/models/algorithm.dart';
+import 'package:vcompressor/models/video_codec.dart';
 import 'package:vcompressor/providers/video_config_provider.dart';
 
 /// Provider para manejar la configuración batch (aplicada a todos los videos)
@@ -18,6 +19,10 @@ final batchConfigProvider =
 final batchAlgorithmProvider = Provider<CompressionAlgorithm>(
   (ref) =>
       ref.watch(batchConfigProvider.select((settings) => settings.algorithm)),
+);
+
+final batchCodecProvider = Provider<VideoCodec>(
+  (ref) => ref.watch(batchConfigProvider.select((settings) => settings.codec)),
 );
 
 final batchResolutionProvider = Provider<OutputResolution>(
@@ -73,6 +78,12 @@ final batchFpsProvider = Provider<int?>(
 final batchEnableFpsProvider = Provider<bool>(
   (ref) => ref.watch(
     batchConfigProvider.select((settings) => settings.editSettings.enableFps),
+  ),
+);
+
+final batchEnableCodecProvider = Provider<bool>(
+  (ref) => ref.watch(
+    batchConfigProvider.select((settings) => settings.editSettings.enableCodec),
   ),
 );
 

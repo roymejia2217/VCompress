@@ -36,7 +36,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get french => 'French';
 
   @override
+  String get italian => 'Italian';
+
+  @override
   String get storage => 'Storage';
+
+  @override
+  String get loadingSettings => 'Loading settings...';
+
+  @override
+  String get errorLoadingSettings => 'Error loading settings';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String saveFolderSemantics(String path) {
+    return 'Save folder set to $path';
+  }
+
+  @override
+  String get changeFolderSemantics => 'Change save folder';
+
+  @override
+  String get changeFolderHint => 'Activate to select new folder';
+
+  @override
+  String invalidFilesCount(int count) {
+    return 'Invalid files: $count';
+  }
+
+  @override
+  String get view => 'View';
 
   @override
   String get light => 'Light';
@@ -318,6 +349,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get webm => 'WebM';
+
+  @override
+  String get videoCodec => 'Video codec';
+
+  @override
+  String get h264 => 'H.264 (AVC)';
+
+  @override
+  String get h265 => 'H.265 (HEVC)';
 
   @override
   String selected(int count) {

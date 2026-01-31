@@ -48,8 +48,8 @@ class TasksController extends StateNotifier<List<VideoTask>> {
   // Helper centralizado para operaciones de filesystem
   static const _fsHelper = FileSystemHelper();
 
-  // Controla el estado de cancelación de procesos de compresión
-  bool _isCancelled = false;
+  // Controla el estado de cancelación GLOBAL de procesos de compresión
+  bool _isGlobalCancelled = false;
 
   TasksController(this._ref) : super(const []) {
     _initializeServices();
@@ -238,8 +238,8 @@ class TasksController extends StateNotifier<List<VideoTask>> {
     void Function(String?)? onTimeEstimate,
   }) async {
     try {
-      // Resetea flag de cancelación al iniciar nuevo proceso
-      _isCancelled = false;
+      // Resetea flag de cancelación global
+      _isGlobalCancelled = false;
 
       if (state.isEmpty) {
         AppLogger.warning(
@@ -272,15 +272,29 @@ class TasksController extends StateNotifier<List<VideoTask>> {
 
       // Procesa cada tarea individualmente con actualización de progreso
       for (int i = 0; i < state.length; i++) {
-        if (_isCancelled) {
+        // 1. Chequeo Global: Si se canceló todo, salir del loop
+        if (_isGlobalCancelled) {
           AppLogger.info(
-            'Compresión cancelada por usuario',
+            'Compresión global cancelada por usuario',
             tag: 'TasksController',
           );
           break;
         }
 
-        final task = state[i];
+        // Obtener estado actual de la tarea (puede haber cambiado por UI)
+        var task = state[i];
+
+        // 2. Chequeo Individual: Si esta tarea fue cancelada, saltar a la siguiente
+        if (task.isCancelled) {
+           AppLogger.info(
+            'Saltando tarea cancelada: ${task.fileName}',
+            tag: 'TasksController',
+          );
+          continue;
+        }
+        
+        // Si ya está completada (ej. reintento), saltar
+        if (task.isCompleted) continue;
 
         // Generar ruta de salida
         final outputPath = _fsHelper.buildOutputPath(
@@ -309,6 +323,24 @@ class TasksController extends StateNotifier<List<VideoTask>> {
           onProgress(i, state.length, percent, fileName);
         }, onTimeEstimate: onTimeEstimate);
 
+        // Verificar estado post-ejecución
+        final taskAfter = state.firstWhere((t) => t.id == task.id);
+        
+        // Si fue cancelada individualmente durante la ejecución
+        if (taskAfter.isCancelled) {
+          // Ya está marcada como cancelada por cancelTask(), no sobrescribir con error
+           AppLogger.info(
+            'Tarea cancelada durante ejecución: ${task.id}',
+            tag: 'TasksController',
+          );
+          continue;
+        }
+        
+        // Si fue cancelada globalmente
+        if (_isGlobalCancelled) {
+           break;
+        }
+
         if (result.isSuccess) {
           // Task ya actualizado en execute(), marcar completado con datos finales
           final completedTask = state.firstWhere((t) => t.id == task.id);
@@ -318,7 +350,7 @@ class TasksController extends StateNotifier<List<VideoTask>> {
             completedTask.outputPath!,
           );
         } else {
-          // Marcar error
+          // Marcar error (si no fue cancelación)
           markTaskError(
             task.id,
             result.error?.userMessage ?? 'Error desconocido',
@@ -327,7 +359,7 @@ class TasksController extends StateNotifier<List<VideoTask>> {
       }
 
       AppLogger.info(
-        'Compresión completada exitosamente',
+        'Compresión completada/finalizada',
         tag: 'TasksController',
       );
 
@@ -500,17 +532,43 @@ class TasksController extends StateNotifier<List<VideoTask>> {
     }
   }
 
-  /// Cancela el proceso de compresión actual
+  /// Cancela TODO el proceso de compresión
   void cancelCompression() {
-    if (_isCancelled) return; // Previene múltiples llamadas de cancelación
+    if (_isGlobalCancelled) return; // Previene múltiples llamadas
 
-    AppLogger.info('Cancelando compresión de videos', tag: 'TasksController');
-    _isCancelled = true;
+    AppLogger.info('Cancelando TODA la compresión', tag: 'TasksController');
+    _isGlobalCancelled = true;
     _processorService.cancelCurrentProcess();
   }
 
-  /// Verifica si la compresión actual está cancelada
-  bool get isCancelled => _isCancelled;
+  /// Cancela una tarea específica
+  void cancelTask(int taskId) {
+    AppLogger.info('Cancelando tarea: $taskId', tag: 'TasksController');
+    
+    // 1. Marcar tarea como cancelada en el estado
+    try {
+      final task = state.firstWhere((t) => t.id == taskId);
+      
+      // Si ya está cancelada o completada, ignorar
+      if (task.isCancelled || task.isCompleted) return;
+
+      // Actualizar estado
+      state = state.map((t) => 
+        t.id == taskId ? t.copyWith(isCancelled: true) : t
+      ).toList(growable: false);
+
+      // 2. Si está procesando actualmente, detener el procesador
+      if (task.isProcessing) {
+        AppLogger.info('Deteniendo proceso activo para tarea: $taskId', tag: 'TasksController');
+        _processorService.cancelCurrentProcess();
+      }
+    } catch (e) {
+      AppLogger.warning('Intentando cancelar tarea inexistente: $taskId', tag: 'TasksController');
+    }
+  }
+
+  /// Verifica si la compresión global está cancelada
+  bool get isCancelled => _isGlobalCancelled;
 
   /// Limpia archivos temporales del caché (inputPath, thumbnailPath en /cache/)
   Future<void> _cleanupCacheAfterCompression() async {

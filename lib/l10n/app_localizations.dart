@@ -156,11 +156,65 @@ abstract class AppLocalizations {
   /// **'Francés'**
   String get french;
 
+  /// Nombre del idioma italiano
+  ///
+  /// In es, this message translates to:
+  /// **'Italiano'**
+  String get italian;
+
   /// Título de sección de almacenamiento
   ///
   /// In es, this message translates to:
   /// **'Almacenamiento'**
   String get storage;
+
+  /// Mensaje mostrado mientras carga la configuración
+  ///
+  /// In es, this message translates to:
+  /// **'Cargando configuración...'**
+  String get loadingSettings;
+
+  /// Mensaje de error cuando falla la carga de configuración
+  ///
+  /// In es, this message translates to:
+  /// **'Error al cargar configuración'**
+  String get errorLoadingSettings;
+
+  /// Texto del botón reintentar
+  ///
+  /// In es, this message translates to:
+  /// **'Reintentar'**
+  String get retry;
+
+  /// Etiqueta semántica para la carpeta de guardado
+  ///
+  /// In es, this message translates to:
+  /// **'Carpeta de guardado configurada como {path}'**
+  String saveFolderSemantics(String path);
+
+  /// Etiqueta semántica para el botón de cambiar carpeta
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar carpeta de guardado'**
+  String get changeFolderSemantics;
+
+  /// Pista semántica para el botón de cambiar carpeta
+  ///
+  /// In es, this message translates to:
+  /// **'Activa para seleccionar nueva carpeta'**
+  String get changeFolderHint;
+
+  /// Mensaje mostrando cantidad de archivos no válidos
+  ///
+  /// In es, this message translates to:
+  /// **'Archivos no válidos: {count}'**
+  String invalidFilesCount(int count);
+
+  /// Texto del botón para ver detalles
+  ///
+  /// In es, this message translates to:
+  /// **'Ver'**
+  String get view;
 
   /// No description provided for @light.
   ///
@@ -665,6 +719,24 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'WebM'**
   String get webm;
+
+  /// Etiqueta para el selector de códec de video
+  ///
+  /// In es, this message translates to:
+  /// **'Códec de video'**
+  String get videoCodec;
+
+  /// Códec de video: H.264
+  ///
+  /// In es, this message translates to:
+  /// **'H.264 (AVC)'**
+  String get h264;
+
+  /// Códec de video: H.265
+  ///
+  /// In es, this message translates to:
+  /// **'H.265 (HEVC)'**
+  String get h265;
 
   /// Mensaje de cantidad de elementos seleccionados
   ///

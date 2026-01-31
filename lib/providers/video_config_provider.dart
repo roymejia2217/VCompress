@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vcompressor/models/video_task.dart';
 import 'package:vcompressor/models/algorithm.dart';
+import 'package:vcompressor/models/video_codec.dart';
 import 'package:vcompressor/l10n/app_localizations.dart';
 
 /// Provider para manejar la configuración de video de manera optimizada
@@ -12,6 +13,18 @@ class VideoConfigNotifier extends StateNotifier<VideoSettings> {
   /// Actualiza el algoritmo de compresión
   void updateAlgorithm(CompressionAlgorithm algorithm) {
     state = state.copyWith(algorithm: algorithm);
+  }
+
+  /// Actualiza el códec de video
+  void updateCodec(VideoCodec codec) {
+    state = state.copyWith(codec: codec);
+  }
+
+  /// Actualiza la configuración de habilitación de codec manual
+  void updateCodecSettings(bool enableCodec) {
+    state = state.copyWith(
+      editSettings: state.editSettings.copyWith(enableCodec: enableCodec),
+    );
   }
 
   /// Actualiza la resolución de salida
@@ -108,6 +121,13 @@ final videoAlgorithmProvider = Provider.family<CompressionAlgorithm, VideoTask>(
   ),
 );
 
+/// Provider para obtener solo el códec de video
+final videoCodecProvider = Provider.family<VideoCodec, VideoTask>(
+  (ref, task) => ref.watch(
+    videoConfigProvider(task).select((settings) => settings.codec),
+  ),
+);
+
 /// Provider para obtener solo la resolución
 final videoResolutionProvider = Provider.family<OutputResolution, VideoTask>(
   (ref, task) => ref.watch(
@@ -183,6 +203,15 @@ final videoEnableFpsProvider = Provider.family<bool, VideoTask>(
     videoConfigProvider(
       task,
     ).select((settings) => settings.editSettings.enableFps),
+  ),
+);
+
+/// Provider para obtener el estado de habilitación de selección de codec
+final videoEnableCodecProvider = Provider.family<bool, VideoTask>(
+  (ref, task) => ref.watch(
+    videoConfigProvider(
+      task,
+    ).select((settings) => settings.editSettings.enableCodec),
   ),
 );
 
@@ -298,6 +327,10 @@ String _buildEditSummary(VideoSettings settings, BuildContext context) {
     edits.add(l10n.fpsFormat(settings.editSettings.targetFps.toString()));
   }
 
+  if (settings.editSettings.enableCodec) {
+    edits.add(settings.codec.name.toUpperCase());
+  }
+
   if (settings.editSettings.replaceOriginalFile) {
     edits.add(l10n.replaceOriginal);
   }
@@ -312,5 +345,6 @@ bool _hasEditSettings(VideoSettings settings) {
       settings.editSettings.enableSquareFormat ||
       settings.editSettings.enableSpeed ||
       settings.editSettings.enableFps ||
+      settings.editSettings.enableCodec ||
       settings.editSettings.replaceOriginalFile;
 }

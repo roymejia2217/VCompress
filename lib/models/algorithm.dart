@@ -1,5 +1,3 @@
-import 'package:vcompressor/core/hardware/hardware_encoder_detector.dart';
-
 enum CompressionAlgorithm {
   maximaCalidad('Máxima Calidad'),
   excelenteCalidad('Excelente Calidad'),
@@ -24,50 +22,6 @@ extension CompressionAlgorithmX on CompressionAlgorithm {
         return 'Calidad aceptable. Archivos muy pequeños.';
       case CompressionAlgorithm.ultraCompresion:
         return 'Calidad básica. Máxima compresión posible.';
-    }
-  }
-
-  String get ffmpegCodec {
-    switch (this) {
-      case CompressionAlgorithm.maximaCalidad:
-        return 'libx264';
-      case CompressionAlgorithm.excelenteCalidad:
-        return 'libx265';
-      case CompressionAlgorithm.buenaCalidad:
-        return 'libx264';
-      case CompressionAlgorithm.compresionMedia:
-        return 'libx265';
-      case CompressionAlgorithm.ultraCompresion:
-        return 'libx264';
-    }
-  }
-
-  /// Obtiene el codec de hardware específico para el procesador detectado
-  Future<String> getHardwareCodec({
-    required int resolutionHeight,
-    required String outputFormat,
-  }) async {
-    try {
-      return await HardwareEncoderDetector.getOptimalEncoder(ffmpegCodec) ??
-          hwCodec;
-    } catch (e) {
-      // Fallback al codec de hardware genérico
-      return hwCodec;
-    }
-  }
-
-  String get hwCodec {
-    switch (this) {
-      case CompressionAlgorithm.maximaCalidad:
-        return 'h264_mediacodec';
-      case CompressionAlgorithm.excelenteCalidad:
-        return 'hevc_mediacodec';
-      case CompressionAlgorithm.buenaCalidad:
-        return 'h264_mediacodec';
-      case CompressionAlgorithm.compresionMedia:
-        return 'hevc_mediacodec';
-      case CompressionAlgorithm.ultraCompresion:
-        return 'h264_mediacodec';
     }
   }
 
@@ -101,21 +55,37 @@ extension CompressionAlgorithmX on CompressionAlgorithm {
     }
   }
 
-  /// Obtiene el bitrate recomendado basado en la resolución y el procesador
+  /// Obtiene el bitrate recomendado basado en la resolución y el preset de calidad
   Future<int> getRecommendedBitrate({
     required int resolutionHeight,
     required String outputFormat,
   }) async {
     try {
-      // Simplificado: usar bitrates estándar basados en resolución
-      return _getFallbackBitrate(resolutionHeight);
+      final baseBitrate = _getFallbackBitrate(resolutionHeight);
+      final multiplier = _getBitrateMultiplier();
+      return (baseBitrate * multiplier).round();
     } catch (e) {
-      // Fallback seguro
       return _getFallbackBitrate(resolutionHeight);
     }
   }
 
-  /// Obtiene bitrate de fallback basado en la resolución
+  /// Multiplicador de bitrate basado en la calidad deseada
+  double _getBitrateMultiplier() {
+    switch (this) {
+      case CompressionAlgorithm.maximaCalidad:
+        return 1.5; // +50% bitrate
+      case CompressionAlgorithm.excelenteCalidad:
+        return 1.0; // Bitrate estándar
+      case CompressionAlgorithm.buenaCalidad:
+        return 0.75; // -25% bitrate
+      case CompressionAlgorithm.compresionMedia:
+        return 0.5; // -50% bitrate
+      case CompressionAlgorithm.ultraCompresion:
+        return 0.25; // -75% bitrate (Máxima compresión)
+    }
+  }
+
+  /// Obtiene bitrate de fallback basado en la resolución (Estándar para H.264)
   int _getFallbackBitrate(int resolutionHeight) {
     switch (resolutionHeight) {
       case 240:
@@ -133,54 +103,9 @@ extension CompressionAlgorithmX on CompressionAlgorithm {
       case 2160:
         return 25000000; // 25 Mbps
       default:
-        return 2000000; // 2 Mbps por defecto
-    }
-  }
-
-  /// Verifica si el algoritmo es compatible con la resolución y el procesador
-  Future<bool> isCompatibleWithResolution({
-    required int resolutionHeight,
-    required String outputFormat,
-  }) async {
-    try {
-      // Simplificado: asumir compatibilidad para todas las resoluciones
-      return true;
-    } catch (e) {
-      // En caso de error, asumir compatibilidad
-      return true;
-    }
-  }
-
-  /// Obtiene información detallada sobre las capacidades del encoder
-  Future<String> getEncoderInfo({
-    required int resolutionHeight,
-    required String outputFormat,
-  }) async {
-    try {
-      final processorType = await HardwareEncoderDetector.detectProcessorType();
-      // final encoders = await HardwareEncoderDetector.getHardwareEncoders();
-
-      final buffer = StringBuffer();
-      buffer.writeln('Algoritmo: $displayName');
-      buffer.writeln('Procesador: $processorType');
-      buffer.writeln('Resolución: ${resolutionHeight}p');
-      buffer.writeln('Formato: $outputFormat');
-      buffer.writeln('Codec Software: $ffmpegCodec');
-      buffer.writeln(
-        'Codec Hardware: ${await getHardwareCodec(resolutionHeight: resolutionHeight, outputFormat: outputFormat)}',
-      );
-      buffer.writeln('CRF: $crfValue');
-      buffer.writeln('Preset: $preset');
-      buffer.writeln(
-        'Bitrate Recomendado: ${await getRecommendedBitrate(resolutionHeight: resolutionHeight, outputFormat: outputFormat) ~/ 1000000} Mbps',
-      );
-      buffer.writeln(
-        'Compatible: ${await isCompatibleWithResolution(resolutionHeight: resolutionHeight, outputFormat: outputFormat)}',
-      );
-
-      return buffer.toString();
-    } catch (e) {
-      return 'Error obteniendo información del encoder: $e';
+        // Estimación lineal para resoluciones no estándar
+        if (resolutionHeight < 360) return 500000;
+        return 2000000;
     }
   }
 }

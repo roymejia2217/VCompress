@@ -64,21 +64,5 @@ void main() {
         );
       }
     });
-
-    test('ffmpegCodec is available for all values', () {
-      // Verificar que todos los codecs están definidos
-      for (final algorithm in CompressionAlgorithm.values) {
-        expect(
-          algorithm.ffmpegCodec.isNotEmpty,
-          true,
-          reason: 'ffmpegCodec should not be empty for ${algorithm.name}',
-        );
-        expect(
-          ['libx264', 'libx265'].contains(algorithm.ffmpegCodec),
-          true,
-          reason: 'ffmpegCodec should be valid for ${algorithm.name}',
-        );
-      }
-    });
   });
 }

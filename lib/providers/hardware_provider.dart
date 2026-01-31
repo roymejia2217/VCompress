@@ -22,7 +22,13 @@ class HardwareCapabilitiesNotifier extends AsyncNotifier<HardwareCapabilities> {
           hasH265HwEncoder: cached.hasH265HwEncoder,
         );
 
-        if (validationError == null) {
+        // FIX: Validar que tenemos información real del dispositivo, no fallback
+        // Si el fabricante es "Unknown" o null, el cache es inválido/incompleto
+        final isRealDeviceInfo = cached.manufacturer != null &&
+            cached.manufacturer != 'Unknown' &&
+            cached.manufacturer != 'unknown';
+
+        if (validationError == null && isRealDeviceInfo) {
           // Mantener cache exitoso con keepAlive
           ref.keepAlive();
           debugPrint(
@@ -30,7 +36,9 @@ class HardwareCapabilitiesNotifier extends AsyncNotifier<HardwareCapabilities> {
           );
           return cached;
         } else {
-          debugPrint('Datos de cache inválidos: ${validationError.message}');
+          debugPrint(
+            'Datos de cache inválidos (Error: ${validationError?.message}, RealDevice: $isRealDeviceInfo). Forzando redetección.',
+          );
         }
       }
 

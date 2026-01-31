@@ -89,7 +89,7 @@ class PlatformCodecInfo {
 /// Servicio para comunicación con código nativo de Android
 class PlatformHardwareService {
   static const MethodChannel _channel = MethodChannel(
-    'com.vcompressor.vcompressor/hardware_detection',
+    'com.rjmejia.vcompressor/hardware_detection',
   );
 
   const PlatformHardwareService();

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
@@ -63,20 +64,52 @@ class VideoProcessorServiceMobile implements VideoProcessorService {
           ? _generateTemporaryPath(outputPath)
           : outputPath;
 
-      // Construir comando FFmpeg usando builder centralizado
-      final args = await _ffmpegBuilder.buildFFmpegArgs(
+      // Construir comando FFmpeg usando builder centralizado (Intento 1: Preferencia Hardware)
+      var args = await _ffmpegBuilder.buildFFmpegArgs(
         task,
         actualOutputPath,
         hwCapabilitiesAsync,
       );
 
       // Ejecutar procesamiento
-      final result = await _executeFFmpeg(
+      var result = await _executeFFmpeg(
         args,
         task,
         onProgress,
         onTimeEstimate,
       );
+
+      // RETRY LOGIC: Si falla y era posible usar hardware, intentar con software
+      // CRITICAL: Don't retry if the failure was a user cancellation
+      if (result.isFailure &&
+          result.error?.type != AppErrorType.cancelled &&
+          hwCapabilitiesAsync.canUseHwAccel &&
+          defaultTargetPlatform == TargetPlatform.android) {
+        
+        AppLogger.warning(
+          'Fallo en compresión por hardware. Reintentando con software...',
+          tag: 'VideoProcessor',
+        );
+
+        // Limpiar sesión anterior
+        _currentSessionId = null;
+        
+        // Construir comando forzando software
+        args = await _ffmpegBuilder.buildFFmpegArgs(
+          task,
+          actualOutputPath,
+          hwCapabilitiesAsync,
+          forceSoftware: true,
+        );
+
+        // Reintentar ejecución
+        result = await _executeFFmpeg(
+          args,
+          task,
+          onProgress,
+          onTimeEstimate,
+        );
+      }
 
       if (result.isFailure) {
         return result;
@@ -264,6 +297,12 @@ class VideoProcessorServiceMobile implements VideoProcessorService {
     while (true) {
       final returnCode = await session.getReturnCode();
       if (returnCode != null) {
+        // Check for cancellation FIRST
+        if (ReturnCode.isCancel(returnCode)) {
+          AppLogger.info('FFmpeg session cancelled', tag: 'VideoProcessor');
+          return Failure(AppError.cancelled());
+        }
+
         if (!ReturnCode.isSuccess(returnCode)) {
           final logs = await session.getAllLogsAsString();
           AppLogger.error('FFmpeg error: $logs', tag: 'VideoProcessor');

@@ -77,7 +77,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
             // Enable minification with ProGuard rules for FFmpeg Kit compatibility
             isMinifyEnabled = true
-            isShrinkResources = false
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         debug {

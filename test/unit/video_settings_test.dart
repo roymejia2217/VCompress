@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vcompressor/models/video_task.dart';
 import 'package:vcompressor/models/algorithm.dart';
+import 'package:vcompressor/models/video_codec.dart';
 
 void main() {
   group('VideoSettings Configuration', () {
@@ -10,6 +11,7 @@ void main() {
 
       // Assert
       expect(settings.algorithm, equals(CompressionAlgorithm.excelenteCalidad));
+      expect(settings.codec, equals(VideoCodec.h264));
       expect(settings.resolution, equals(OutputResolution.original));
       expect(settings.removeAudio, isFalse);
       expect(settings.format, equals(OutputFormat.mp4));
@@ -21,6 +23,7 @@ void main() {
       // Act
       const settings = VideoSettings(
         algorithm: CompressionAlgorithm.buenaCalidad,
+        codec: VideoCodec.h265,
         resolution: OutputResolution.p720,
         removeAudio: true,
         format: OutputFormat.mkv,
@@ -28,6 +31,7 @@ void main() {
 
       // Assert
       expect(settings.algorithm, equals(CompressionAlgorithm.buenaCalidad));
+      expect(settings.codec, equals(VideoCodec.h265));
       expect(settings.resolution, equals(OutputResolution.p720));
       expect(settings.removeAudio, isTrue);
       expect(settings.format, equals(OutputFormat.mkv));
@@ -49,6 +53,7 @@ void main() {
       expect(modified.resolution, equals(OutputResolution.p1080));
       expect(modified.removeAudio, isTrue);
       expect(modified.format, equals(original.format)); // Unchanged
+      expect(modified.codec, equals(original.codec)); // Unchanged
     });
 
     test('should provide compressionSettings map', () {
@@ -56,13 +61,17 @@ void main() {
       final settings = VideoSettings.defaults().copyWith(
         algorithm: CompressionAlgorithm.buenaCalidad,
         resolution: OutputResolution.p720,
+        codec: VideoCodec.h264,
       );
 
       // Act
       final compression = settings.compressionSettings;
 
       // Assert
-      expect(compression['video']['codec'], equals('buenaCalidad'));
+      // 'algorithm' stores the algorithm name
+      expect(compression['video']['algorithm'], equals('buenaCalidad'));
+      // 'codec' stores the codec enum name (e.g., 'h264')
+      expect(compression['video']['codec'], equals('h264'));
       expect(compression['video']['resolution'], equals('720'));
       expect(compression['video']['removeAudio'], isFalse);
       expect(compression['edit'], isNotEmpty);
@@ -73,10 +82,12 @@ void main() {
       final settings = VideoSettings.defaults().copyWith(
         algorithm: CompressionAlgorithm.ultraCompresion,
         removeAudio: true,
+        codec: VideoCodec.h265,
       );
 
       // Assert
-      expect(settings.videoConfig['codec'], equals('ultraCompresion'));
+      expect(settings.videoConfig['algorithm'], equals('ultraCompresion'));
+      expect(settings.videoConfig['codec'], equals('h265'));
       expect(settings.videoConfig['removeAudio'], isTrue);
     });
 
@@ -124,6 +135,7 @@ void main() {
       );
       const mediumQuality = VideoSettings(
         algorithm: CompressionAlgorithm.compresionMedia,
+        codec: VideoCodec.h264,
         resolution: OutputResolution.original,
         removeAudio: false,
         format: OutputFormat.mp4,
@@ -137,16 +149,18 @@ void main() {
     test('should generate FFmpeg command based on settings', () {
       // Arrange
       final settings = VideoSettings.defaults().copyWith(
-        algorithm: CompressionAlgorithm.buenaCalidad,
+        algorithm: CompressionAlgorithm.buenaCalidad, // preset: 'fast'
         resolution: OutputResolution.p720,
         removeAudio: true,
+        codec: VideoCodec.h264, // libx264
       );
 
       // Act
       final command = settings.ffmpegCommand;
 
       // Assert
-      expect(command, contains('buenaCalidad'));
+      expect(command, contains('libx264')); // Codec
+      expect(command, contains('-preset fast')); // Preset for buenaCalidad
       expect(command, contains('scale=-2:720'));
       expect(command, contains('-an')); // no audio
       expect(command, contains('-f mp4'));

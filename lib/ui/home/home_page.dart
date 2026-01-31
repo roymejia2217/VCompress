@@ -335,13 +335,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                'Archivos no válidos: ${invalidFiles.length}',
+                                AppLocalizations.of(context)!
+                                    .invalidFilesCount(invalidFiles.length),
                               ),
                               backgroundColor: Theme.of(
                                 context,
                               ).colorScheme.errorContainer,
                               action: SnackBarAction(
-                                label: 'Ver',
+                                label: AppLocalizations.of(context)!.view,
                                 onPressed: () {
                                   AppLogger.debug(
                                     'Archivos rechazados: ${invalidFiles.join(", ")}',
@@ -549,7 +550,9 @@ class _HomePageState extends ConsumerState<HomePage> {
       // Mostrar error simple
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al solicitar permisos: $e'),
+          content: Text(
+            AppLocalizations.of(context)!.permissionRequestError(e.toString()),
+          ),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -562,19 +565,18 @@ class _HomePageState extends ConsumerState<HomePage> {
     return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Permisos requeridos'),
-            content: const Text(
-              'La aplicación necesita acceso a tus videos para continuar. '
-              'Por favor, habilita los permisos en la configuración.',
+            title: Text(AppLocalizations.of(context)!.permissionRequired),
+            content: Text(
+              AppLocalizations.of(context)!.permissionDeniedMessage,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancelar'),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Abrir configuración'),
+                child: Text(AppLocalizations.of(context)!.openSettings),
               ),
             ],
           ),

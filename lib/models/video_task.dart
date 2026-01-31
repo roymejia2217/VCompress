@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 import 'package:vcompressor/models/algorithm.dart';
+import 'package:vcompressor/models/video_codec.dart';
 import 'package:vcompressor/utils/format_utils.dart';
 
 enum OutputResolution {
@@ -93,6 +94,7 @@ class VideoEditSettings {
   final bool enableSpeed; // Habilitar cambio de velocidad
   final bool enableFps; // Habilitar cambio de FPS
   final int? targetFps; // FPS objetivo (null = mantener original)
+  final bool enableCodec; // Habilitar selección manual de codec
   final bool replaceOriginalFile; // Reemplazar archivo original en DCIM
 
   const VideoEditSettings({
@@ -105,6 +107,7 @@ class VideoEditSettings {
     this.enableSpeed = false,
     this.enableFps = false,
     this.targetFps,
+    this.enableCodec = false,
     this.replaceOriginalFile = false,
   });
 
@@ -120,6 +123,7 @@ class VideoEditSettings {
     bool? enableSpeed,
     bool? enableFps,
     int? targetFps,
+    bool? enableCodec,
     bool? replaceOriginalFile,
   }) {
     return VideoEditSettings(
@@ -132,6 +136,7 @@ class VideoEditSettings {
       enableSpeed: enableSpeed ?? this.enableSpeed,
       enableFps: enableFps ?? this.enableFps,
       targetFps: targetFps ?? this.targetFps,
+      enableCodec: enableCodec ?? this.enableCodec,
       replaceOriginalFile: replaceOriginalFile ?? this.replaceOriginalFile,
     );
   }
@@ -153,6 +158,7 @@ class VideoEditSettings {
     enableSpeed,
     enableFps,
     targetFps,
+    enableCodec,
     replaceOriginalFile,
   );
 
@@ -170,12 +176,14 @@ class VideoEditSettings {
           enableSpeed == other.enableSpeed &&
           enableFps == other.enableFps &&
           targetFps == other.targetFps &&
+          enableCodec == other.enableCodec &&
           replaceOriginalFile == other.replaceOriginalFile;
 }
 
 @immutable
 class VideoSettings {
   final CompressionAlgorithm algorithm;
+  final VideoCodec codec;
   final OutputResolution resolution;
   final bool removeAudio;
   final OutputFormat format;
@@ -183,6 +191,7 @@ class VideoSettings {
 
   const VideoSettings({
     required this.algorithm,
+    required this.codec,
     required this.resolution,
     required this.removeAudio,
     required this.format,
@@ -191,6 +200,7 @@ class VideoSettings {
 
   factory VideoSettings.defaults() => const VideoSettings(
     algorithm: CompressionAlgorithm.excelenteCalidad,
+    codec: VideoCodec.h264,
     resolution: OutputResolution.original,
     removeAudio: false,
     format: OutputFormat.mp4,
@@ -199,6 +209,7 @@ class VideoSettings {
 
   VideoSettings copyWith({
     CompressionAlgorithm? algorithm,
+    VideoCodec? codec,
     OutputResolution? resolution,
     bool? removeAudio,
     OutputFormat? format,
@@ -206,6 +217,7 @@ class VideoSettings {
   }) {
     return VideoSettings(
       algorithm: algorithm ?? this.algorithm,
+      codec: codec ?? this.codec,
       resolution: resolution ?? this.resolution,
       removeAudio: removeAudio ?? this.removeAudio,
       format: format ?? this.format,
@@ -218,7 +230,8 @@ class VideoSettings {
   Map<String, dynamic> get compressionSettings {
     return {
       'video': {
-        'codec': algorithm.name,
+        'algorithm': algorithm.name,
+        'codec': codec.name,
         'resolution': resolution.scaleHeightArg,
         'format': format.extension,
         'removeAudio': removeAudio,
@@ -233,6 +246,7 @@ class VideoSettings {
         'enableSpeed': editSettings.enableSpeed,
         'enableFps': editSettings.enableFps,
         'targetFps': editSettings.targetFps,
+        'enableCodec': editSettings.enableCodec,
         'replaceOriginalFile': editSettings.replaceOriginalFile,
       },
     };
@@ -264,7 +278,8 @@ class VideoSettings {
     final editSettings = editConfig;
 
     final parts = <String>[
-      '-c:v ${algorithm.name}',
+      '-c:v ${codec.ffmpegName}',
+      '-preset ${algorithm.preset}',
       if (resolution.scaleHeightArg != null)
         '-vf scale=-2:${resolution.scaleHeightArg}',
       '-f ${format.name}',
@@ -282,7 +297,7 @@ class VideoSettings {
   // hashCode para detección de cambios en configuración
   @override
   int get hashCode =>
-      Object.hash(algorithm, resolution, removeAudio, format, editSettings);
+      Object.hash(algorithm, codec, resolution, removeAudio, format, editSettings);
 
   @override
   bool operator ==(Object other) =>
@@ -290,6 +305,7 @@ class VideoSettings {
       other is VideoSettings &&
           runtimeType == other.runtimeType &&
           algorithm == other.algorithm &&
+          codec == other.codec &&
           resolution == other.resolution &&
           removeAudio == other.removeAudio &&
           format == other.format &&
@@ -301,7 +317,8 @@ enum VideoTaskState {
   pending, // En espera - no iniciado
   processing, // Procesando activamente
   completed, // Completado exitosamente
-  error, // Error o cancelado
+  error, // Error
+  cancelled, // Cancelado por usuario
 }
 
 @immutable
@@ -329,6 +346,9 @@ class VideoTask {
   // NUEVO: Mensaje de error si la compresión falla
   final String? errorMessage;
 
+  // NUEVO: Flag explícito para cancelación
+  final bool isCancelled;
+
   const VideoTask({
     required this.id,
     required this.inputPath,
@@ -346,6 +366,7 @@ class VideoTask {
     this.originalContentUri,
     this.progress,
     this.errorMessage,
+    this.isCancelled = false,
   });
 
   VideoTask copyWith({
@@ -363,6 +384,7 @@ class VideoTask {
     String? originalContentUri,
     double? progress,
     String? errorMessage,
+    bool? isCancelled,
     bool clearProgress = false,
     bool clearErrorMessage = false,
   }) {
@@ -385,6 +407,7 @@ class VideoTask {
       errorMessage: clearErrorMessage
           ? null
           : (errorMessage ?? this.errorMessage),
+      isCancelled: isCancelled ?? this.isCancelled,
     );
   }
 
@@ -421,6 +444,11 @@ class VideoTask {
   /// Determina el estado actual del task basado en sus campos
   ///  KISS: Prioridad simple - processing > error > completed > pending
   VideoTaskState get state {
+    // PRIORIDAD 0: Cancelado
+    if (isCancelled) {
+      return VideoTaskState.cancelled;
+    }
+
     // PRIORIDAD 1: Processing activo (reprocesamiento o procesamiento inicial)
     if (progress != null && progress! > 0) {
       return VideoTaskState.processing;
@@ -478,8 +506,8 @@ class VideoTask {
   bool get isInProgress => state == VideoTaskState.processing;
 
   // GETTER: Estado es fallido
-  /// Retorna true si la compresión falló.
-  bool get isFailed => state == VideoTaskState.error;
+  /// Retorna true si la compresión falló o fue cancelada.
+  bool get isFailed => state == VideoTaskState.error || state == VideoTaskState.cancelled;
 
   // GETTER: Duración de procesamiento (si se puede calcular)
   /// Calcula la duración total de procesamiento si existe información suficiente.

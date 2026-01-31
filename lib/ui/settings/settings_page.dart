@@ -125,22 +125,22 @@ class SettingsPage extends ConsumerWidget {
                     expandedInsets: EdgeInsets.zero,
                     enableSearch: true,
                     initialSelection: locale,
-                    dropdownMenuEntries: const [
+                    dropdownMenuEntries: [
                       DropdownMenuEntry<Locale>(
-                        value: Locale('es'),
-                        label: 'Español',
+                        value: const Locale('es'),
+                        label: l10n.spanish,
                       ),
                       DropdownMenuEntry<Locale>(
-                        value: Locale('en'),
-                        label: 'English',
+                        value: const Locale('en'),
+                        label: l10n.english,
                       ),
                       DropdownMenuEntry<Locale>(
-                        value: Locale('fr'),
-                        label: 'Français',
+                        value: const Locale('fr'),
+                        label: l10n.french,
                       ),
                       DropdownMenuEntry<Locale>(
-                        value: Locale('it'),
-                        label: 'Italiano',
+                        value: const Locale('it'),
+                        label: l10n.italian,
                       ),
                     ],
                     onSelected: (value) {
@@ -184,8 +184,7 @@ class SettingsPage extends ConsumerWidget {
                     data: (saveDir) => Column(
                       children: [
                         Semantics(
-                          label:
-                              'Carpeta de guardado configurada como $saveDir',
+                          label: l10n.saveFolderSemantics(saveDir),
                           child: ListTile(
                             contentPadding: EdgeInsets.zero,
                             title: Text(l10n.saveFolder),
@@ -198,8 +197,8 @@ class SettingsPage extends ConsumerWidget {
                         ),
                         const SizedBox(height: tokens.AppSpacing.s),
                         Semantics(
-                          label: 'Cambiar carpeta de guardado',
-                          hint: 'Activa para seleccionar nueva carpeta',
+                          label: l10n.changeFolderSemantics,
+                          hint: l10n.changeFolderHint,
                           button: true,
                           child: ListTile(
                             contentPadding: EdgeInsets.zero,
@@ -230,10 +229,10 @@ class SettingsPage extends ConsumerWidget {
                       ],
                     ),
                     // Estado de carga
-                    loading: () => const ListTile(
+                    loading: () => ListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: CircularProgressIndicator(),
-                      title: Text('Cargando configuración...'),
+                      leading: const CircularProgressIndicator(),
+                      title: Text(l10n.loadingSettings),
                     ),
                     // Estado de error
                     error: (error, stack) => Column(
@@ -244,7 +243,7 @@ class SettingsPage extends ConsumerWidget {
                             icon: PhosphorIconsRegular.xCircle,
                             color: Colors.red,
                           ),
-                          title: const Text('Error al cargar configuración'),
+                          title: Text(l10n.errorLoadingSettings),
                           subtitle: Text(error.toString()),
                         ),
                         const SizedBox(height: tokens.AppSpacing.xs),
@@ -253,7 +252,7 @@ class SettingsPage extends ConsumerWidget {
                           leading: const AppIcon.small(
                             icon: PhosphorIconsRegular.arrowClockwise,
                           ),
-                          title: const Text('Reintentar'),
+                          title: Text(l10n.retry),
                           onTap: () => ref.invalidate(saveDirProvider),
                         ),
                       ],

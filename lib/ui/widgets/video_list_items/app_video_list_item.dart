@@ -419,6 +419,26 @@ class AppVideoListItem extends ConsumerWidget {
           ),
         ],
       ),
+
+      VideoTaskState.cancelled => Row(
+        children: [
+          Icon(
+            PhosphorIconsFill.prohibit,
+            size: 16,
+            color: colorScheme.secondary,
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.secondary,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     };
   }
 

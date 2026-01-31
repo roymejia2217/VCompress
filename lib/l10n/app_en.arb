@@ -45,10 +45,65 @@
   "@french": {
     "description": "French language name"
   },
+
+  "italian": "Italian",
+  "@italian": {
+    "description": "Italian language name"
+  },
   
   "storage": "Storage",
   "@storage": {
     "description": "Storage section title"
+  },
+  
+  "loadingSettings": "Loading settings...",
+  "@loadingSettings": {
+    "description": "Message shown while settings are loading"
+  },
+
+  "errorLoadingSettings": "Error loading settings",
+  "@errorLoadingSettings": {
+    "description": "Error message when settings fail to load"
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+
+  "saveFolderSemantics": "Save folder set to {path}",
+  "@saveFolderSemantics": {
+    "description": "Semantics label for save folder tile",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+
+  "changeFolderSemantics": "Change save folder",
+  "@changeFolderSemantics": {
+    "description": "Semantics label for change folder button"
+  },
+
+  "changeFolderHint": "Activate to select new folder",
+  "@changeFolderHint": {
+    "description": "Semantics hint for change folder button"
+  },
+
+  "invalidFilesCount": "Invalid files: {count}",
+  "@invalidFilesCount": {
+    "description": "Message showing count of invalid files",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "view": "View",
+  "@view": {
+    "description": "Button text to view details"
   },
   
   "light": "Light",
@@ -436,6 +491,21 @@
   "webm": "WebM",
   "@webm": {
     "description": "Output format: WebM"
+  },
+
+  "videoCodec": "Video codec",
+  "@videoCodec": {
+    "description": "Label for video codec selector"
+  },
+
+  "h264": "H.264 (AVC)",
+  "@h264": {
+    "description": "Video codec: H.264"
+  },
+
+  "h265": "H.265 (HEVC)",
+  "@h265": {
+    "description": "Video codec: H.265"
   },
 
   "selected": "{count,plural, =0{No items selected} =1{1 item selected} other{{count} items selected}}",

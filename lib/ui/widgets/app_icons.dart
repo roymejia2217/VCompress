@@ -90,6 +90,7 @@ class AppIcon extends StatelessWidget {
       VideoTaskState.processing => PhosphorIconsFill.arrowsClockwise,
       VideoTaskState.completed => PhosphorIconsFill.checkCircle,
       VideoTaskState.error => PhosphorIconsFill.xCircle,
+      VideoTaskState.cancelled => PhosphorIconsFill.prohibit,
     };
 
     return AppIcon(
@@ -111,6 +112,8 @@ class AppIcon extends StatelessWidget {
         return 'Completado';
       case VideoTaskState.error:
         return 'Error';
+      case VideoTaskState.cancelled:
+        return 'Cancelado';
     }
   }
 
@@ -135,6 +138,7 @@ class AppIcon extends StatelessWidget {
     if (icon == PhosphorIconsFill.arrowsClockwise) return colorScheme.primary;
     if (icon == PhosphorIconsFill.checkCircle) return Colors.green.shade400;
     if (icon == PhosphorIconsFill.xCircle) return colorScheme.error;
+    if (icon == PhosphorIconsFill.prohibit) return colorScheme.secondary;
 
     // Fallback para otros iconos
     return config.usePrimaryColor ? colorScheme.primary : colorScheme.onSurface;

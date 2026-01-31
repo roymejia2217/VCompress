@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:vcompressor/models/video_task.dart';
 import 'package:vcompressor/models/algorithm.dart';
+import 'package:vcompressor/models/video_codec.dart';
 import 'package:vcompressor/core/logging/app_logger.dart';
 import 'package:vcompressor/utils/hardware_detector.dart';
 
@@ -14,16 +15,23 @@ class FFmpegCommandBuilder {
   Future<List<String>> buildFFmpegArgs(
     VideoTask task,
     String outputPath,
-    HardwareCapabilities hwCapabilities,
-  ) async {
+    HardwareCapabilities hwCapabilities, {
+    bool forceSoftware = false,
+  }) async {
     final args = <String>['-y'];
 
-    // Agregar aceleración por hardware si está disponible
-    if (hwCapabilities.canUseHwAccel &&
+    // Agregar aceleración por hardware si está disponible y no se fuerza software
+    if (!forceSoftware &&
+        hwCapabilities.canUseHwAccel &&
         defaultTargetPlatform == TargetPlatform.android) {
       args.addAll(['-hwaccel', 'mediacodec']);
       AppLogger.debug(
         'Usando aceleración por hardware: MediaCodec',
+        tag: 'FFmpegCommandBuilder',
+      );
+    } else if (forceSoftware) {
+      AppLogger.info(
+        'Forzando codificación por software (Retry mode)',
         tag: 'FFmpegCommandBuilder',
       );
     }
@@ -53,7 +61,11 @@ class FFmpegCommandBuilder {
     }
 
     // Codecs
-    final codecs = await _buildCodecArgs(task, hwCapabilities);
+    final codecs = await _buildCodecArgs(
+      task,
+      hwCapabilities,
+      forceSoftware: forceSoftware,
+    );
     args.addAll(codecs);
 
     // Configuración de threads
@@ -157,72 +169,77 @@ class FFmpegCommandBuilder {
   /// Construye los argumentos de codec
   Future<List<String>> _buildCodecArgs(
     VideoTask task,
-    HardwareCapabilities hwCapabilities,
-  ) async {
+    HardwareCapabilities hwCapabilities, {
+    bool forceSoftware = false,
+  }) async {
     final algorithm = task.settings.algorithm;
     final format = task.settings.format;
+    
+    // Si la selección manual de codec no está habilitada, usar H.264 por defecto
+    // a menos que sea WebM (que usa VP9 forzado abajo)
+    final selectedCodec = task.settings.editSettings.enableCodec 
+        ? task.settings.codec 
+        : VideoCodec.h264;
 
     String videoCodec;
     String audioCodec;
 
-    // Seleccionar codec de video
-    try {
-      final resolutionHeight =
-          int.tryParse(task.settings.resolution.scaleHeightArg ?? '720') ?? 720;
-      final outputFormat = format.name;
-
-      final isCompatible = await algorithm.isCompatibleWithResolution(
-        resolutionHeight: resolutionHeight,
-        outputFormat: outputFormat,
-      );
-
-      final useHwCodec =
+    // 1. Determinar el codec de video base
+    // Si el formato es WebM, forzamos VP9
+    if (format == OutputFormat.webm) {
+      videoCodec = 'libvpx-vp9';
+    } else {
+      // Para otros formatos (MP4, MKV, MOV), usamos la selección del usuario
+      // Determinar si podemos usar hardware
+      bool useHardware = false;
+      
+      if (!forceSoftware &&
           hwCapabilities.canUseHwAccel &&
-          defaultTargetPlatform == TargetPlatform.android &&
-          isCompatible;
-
-      if (useHwCodec) {
-        videoCodec = await algorithm.getHardwareCodec(
-          resolutionHeight: resolutionHeight,
-          outputFormat: outputFormat,
-        );
-        AppLogger.debug(
-          'Usando encoder de hardware: $videoCodec',
-          tag: 'FFmpegCommandBuilder',
-        );
+          defaultTargetPlatform == TargetPlatform.android) {
+        
+        switch (selectedCodec) {
+          case VideoCodec.h264:
+            if (hwCapabilities.hasH264HwEncoder) {
+              useHardware = true;
+              videoCodec = 'h264_mediacodec';
+            } else {
+              videoCodec = selectedCodec.ffmpegName;
+            }
+            break;
+            
+          case VideoCodec.h265:
+            if (hwCapabilities.hasH265HwEncoder) {
+              useHardware = true;
+              videoCodec = 'hevc_mediacodec';
+            } else {
+              videoCodec = selectedCodec.ffmpegName;
+            }
+            break;
+            
+          default:
+            videoCodec = selectedCodec.ffmpegName;
+            break;
+        }
       } else {
-        videoCodec = algorithm.ffmpegCodec;
-        AppLogger.debug(
-          'Usando encoder de software: $videoCodec',
-          tag: 'FFmpegCommandBuilder',
-        );
+        // Forzado software o plataforma no Android
+        videoCodec = selectedCodec.ffmpegName;
       }
-    } catch (e) {
-      final useHwCodec =
-          hwCapabilities.canUseHwAccel &&
-          defaultTargetPlatform == TargetPlatform.android &&
-          (format == OutputFormat.mp4 || format == OutputFormat.mov);
-
-      videoCodec = useHwCodec ? algorithm.hwCodec : algorithm.ffmpegCodec;
-      AppLogger.debug('Fallback a encoder: $videoCodec', tag: 'FFmpegCommandBuilder');
+      
+      AppLogger.debug(
+        'Codec seleccionado: ${selectedCodec.name}, Hardware: $useHardware -> $videoCodec',
+        tag: 'FFmpegCommandBuilder',
+      );
     }
 
-    // Seleccionar codec de audio
+    // 2. Seleccionar codec de audio
     switch (format) {
       case OutputFormat.webm:
-        videoCodec = 'libvpx-vp9';
         audioCodec = 'libopus';
         break;
       case OutputFormat.mkv:
-        // No usar copy si hay filtros de audio aplicados
-        if (task.settings.editSettings.speed != 1.0) {
-          audioCodec = 'aac';
-        } else {
-          audioCodec = 'copy';
-        }
-        break;
       default:
         // No usar copy si hay filtros de audio aplicados
+        // O si necesitamos compatibilidad específica
         if (task.settings.editSettings.speed != 1.0) {
           audioCodec = 'aac';
         } else {
@@ -233,12 +250,27 @@ class FFmpegCommandBuilder {
 
     final args = <String>['-c:v', videoCodec];
 
-    // Parámetros específicos del codec
+    // 3. Parámetros específicos del codec (CRF vs Bitrate)
     if (videoCodec == 'libvpx-vp9') {
       args.addAll(['-crf', '${algorithm.crfValue}', '-b:v', '0']);
     } else if (videoCodec.contains('mediacodec')) {
-      args.addAll(['-quality', '${algorithm.crfValue}']);
+      // FIX: Encoders de hardware en Android (MediaCodec) usan Bitrate (-b:v), ignoran CRF
+      final resolutionHeight =
+          int.tryParse(task.settings.resolution.scaleHeightArg ?? '720') ?? 720;
+      
+      final bitrate = await algorithm.getRecommendedBitrate(
+        resolutionHeight: resolutionHeight,
+        outputFormat: format.name,
+      );
+      
+      args.addAll(['-b:v', '$bitrate']);
+      
+      AppLogger.debug(
+        'Configurando bitrate por hardware: ${(bitrate / 1000000).toStringAsFixed(2)} Mbps',
+        tag: 'FFmpegCommandBuilder',
+      );
     } else {
+      // Software encoder (libx264, libx265) usa CRF y Preset
       args.addAll([
         '-preset',
         algorithm.preset,
@@ -247,7 +279,11 @@ class FFmpegCommandBuilder {
       ]);
     }
 
-    // Codec de audio - Solo aplicar si no hay filtros de audio que requieran re-encoding
+    // 4. Codec de audio
+    // Solo aplicar si no hay filtros de audio que requieran re-encoding
+    // Ojo: Si el formato es MP4 y audio es copy, ffmpeg puede quejarse si el source no es compatible
+    // Pero 'aac' es seguro para MP4.
+    
     final hasAudioFilters =
         task.settings.editSettings.enableSpeed &&
         task.settings.editSettings.speed != 1.0;
@@ -272,7 +308,8 @@ class FFmpegCommandBuilder {
     } else if (speed < 0.5) {
       double remainingSpeed = speed;
       while (remainingSpeed < 0.5) {
-        final step = remainingSpeed < 0.25 ? 0.5 : remainingSpeed;
+        // Usar 0.5 como paso constante para reducir velocidad
+        const step = 0.5;
         filters.add('atempo=${step.toStringAsFixed(3)}');
         remainingSpeed /= step;
       }
@@ -282,7 +319,8 @@ class FFmpegCommandBuilder {
     } else if (speed > 2.0) {
       double remainingSpeed = speed;
       while (remainingSpeed > 2.0) {
-        final step = remainingSpeed > 4.0 ? 2.0 : remainingSpeed;
+        // Usar 2.0 como paso constante para aumentar velocidad
+        const step = 2.0;
         filters.add('atempo=${step.toStringAsFixed(3)}');
         remainingSpeed /= step;
       }

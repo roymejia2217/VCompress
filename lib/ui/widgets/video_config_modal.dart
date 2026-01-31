@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vcompressor/models/algorithm.dart';
 import 'package:vcompressor/models/video_task.dart';
+import 'package:vcompressor/models/video_codec.dart';
 import 'package:vcompressor/providers/batch_config_provider.dart';
 import 'package:vcompressor/providers/tasks_provider.dart';
 import 'package:vcompressor/providers/video_config_provider.dart';
+import 'package:vcompressor/providers/hardware_provider.dart';
 import 'package:vcompressor/ui/widgets/labeled_switch.dart';
 import 'package:vcompressor/core/constants/app_design_tokens.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -96,7 +98,7 @@ class VideoConfigModal extends ConsumerWidget {
               const SizedBox(height: 12), // M3 spacing: título → contenido
               // ═══ NIVEL 1: ESENCIAL (80% usuarios) ═══
               _buildAlgorithmSelector(context, ref),
-              const SizedBox(height: AppSpacing.s), // 8dp entre relacionados
+              const SizedBox(height: AppSpacing.s),
               _buildResolutionSelector(context, ref),
               const SizedBox(height: AppSpacing.s),
               _buildFormatSelector(context, ref),
@@ -150,6 +152,120 @@ class VideoConfigModal extends ConsumerWidget {
         }
       },
       label: Text(AppLocalizations.of(context)!.preset),
+    );
+  }
+
+  Widget _buildCodecToggle(BuildContext context, WidgetRef ref) {
+    final enableCodec = _isBatchMode
+        ? ref.watch(batchEnableCodecProvider)
+        : ref.watch(videoEnableCodecProvider(task!));
+
+    final codec = _isBatchMode
+        ? ref.watch(batchCodecProvider)
+        : ref.watch(videoCodecProvider(task!));
+
+    final format = _isBatchMode
+        ? ref.watch(batchFormatProvider)
+        : ref.watch(videoFormatProvider(task!));
+
+    final capabilities = ref.watch(hardwareCapabilitiesProvider).valueOrNull;
+
+    // Solo mostrar H264 y H265 en el selector
+    final options = [VideoCodec.h264, VideoCodec.h265];
+    
+    // Si el formato es WebM, deshabilitar la opción (solo soporta VP9 por ahora)
+    final isFormatCompatible = format != OutputFormat.webm;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        LabeledSwitch(
+          label: AppLocalizations.of(context)!.videoCodec,
+          value: enableCodec && isFormatCompatible,
+          onChanged: isFormatCompatible ? (newValue) {
+            if (newValue) {
+              // Si se activa, mantener el codec actual o default a h264 si es auto
+              final newCodec = codec == VideoCodec.auto ? VideoCodec.h264 : codec;
+              _isBatchMode
+                  ? ref.read(batchConfigProvider.notifier).updateCodecSettings(true)
+                  : ref.read(videoConfigProvider(task!).notifier).updateCodecSettings(true);
+                  
+              // Asegurar que tenemos un codec válido seleccionado
+              _isBatchMode
+                  ? ref.read(batchConfigProvider.notifier).updateCodec(newCodec)
+                  : ref.read(videoConfigProvider(task!).notifier).updateCodec(newCodec);
+            } else {
+              // Si se desactiva
+              _isBatchMode
+                  ? ref.read(batchConfigProvider.notifier).updateCodecSettings(false)
+                  : ref.read(videoConfigProvider(task!).notifier).updateCodecSettings(false);
+            }
+          } : null, // Disabled si el formato no es compatible
+        ),
+
+        // Selector de Codec con animación
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          height: (enableCodec && isFormatCompatible) ? 60 : 0,
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
+            opacity: (enableCodec && isFormatCompatible) ? 1.0 : 0.0,
+            child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: AppSpacing.m,
+                  top: AppSpacing.s,
+                  right: AppSpacing.m,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: SegmentedButton<VideoCodec>(
+                    style: const ButtonStyle(
+                      visualDensity: VisualDensity.compact,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    segments: options.map((option) {
+                      final isHwSupported = option == VideoCodec.h264
+                          ? (capabilities?.hasH264HwEncoder ?? false)
+                          : (capabilities?.hasH265HwEncoder ?? false);
+
+                      return ButtonSegment(
+                        value: option,
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(option.getLocalizedName(context)),
+                            if (isHwSupported) ...[
+                              const SizedBox(width: 4),
+                              Icon(
+                                PhosphorIcons.lightning(), 
+                                size: 14, 
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ],
+                          ],
+                        ),
+                        tooltip: isHwSupported ? 'Hardware Acceleration Available' : null,
+                      );
+                    }).toList(),
+                    selected: {codec == VideoCodec.auto ? VideoCodec.h264 : codec},
+                    onSelectionChanged: (selection) {
+                      if (selection.isNotEmpty) {
+                        _isBatchMode
+                            ? ref.read(batchConfigProvider.notifier).updateCodec(selection.first)
+                            : ref.read(videoConfigProvider(task!).notifier).updateCodec(selection.first);
+                      }
+                    },
+                    showSelectedIcon: false,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -550,6 +666,10 @@ class VideoConfigModal extends ConsumerWidget {
 
         // Toggle 2: Formato cuadrado
         _buildSquareFormatToggle(context, ref),
+        const SizedBox(height: AppSpacing.s),
+
+        // Codec Toggle
+        _buildCodecToggle(context, ref),
         const SizedBox(height: AppSpacing.s),
 
         // FPS Selector

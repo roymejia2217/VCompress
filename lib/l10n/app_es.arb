@@ -46,9 +46,64 @@
     "description": "Nombre del idioma francés"
   },
   
+  "italian": "Italiano",
+  "@italian": {
+    "description": "Nombre del idioma italiano"
+  },
+  
   "storage": "Almacenamiento",
   "@storage": {
     "description": "Título de sección de almacenamiento"
+  },
+  
+  "loadingSettings": "Cargando configuración...",
+  "@loadingSettings": {
+    "description": "Mensaje mostrado mientras carga la configuración"
+  },
+  
+  "errorLoadingSettings": "Error al cargar configuración",
+  "@errorLoadingSettings": {
+    "description": "Mensaje de error cuando falla la carga de configuración"
+  },
+  
+  "retry": "Reintentar",
+  "@retry": {
+    "description": "Texto del botón reintentar"
+  },
+  
+  "saveFolderSemantics": "Carpeta de guardado configurada como {path}",
+  "@saveFolderSemantics": {
+    "description": "Etiqueta semántica para la carpeta de guardado",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "changeFolderSemantics": "Cambiar carpeta de guardado",
+  "@changeFolderSemantics": {
+    "description": "Etiqueta semántica para el botón de cambiar carpeta"
+  },
+  
+  "changeFolderHint": "Activa para seleccionar nueva carpeta",
+  "@changeFolderHint": {
+    "description": "Pista semántica para el botón de cambiar carpeta"
+  },
+  
+  "invalidFilesCount": "Archivos no válidos: {count}",
+  "@invalidFilesCount": {
+    "description": "Mensaje mostrando cantidad de archivos no válidos",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "view": "Ver",
+  "@view": {
+    "description": "Texto del botón para ver detalles"
   },
   
   "light": "Claro",
@@ -436,6 +491,21 @@
   "webm": "WebM",
   "@webm": {
     "description": "Formato de salida: WebM"
+  },
+
+  "videoCodec": "Códec de video",
+  "@videoCodec": {
+    "description": "Etiqueta para el selector de códec de video"
+  },
+
+  "h264": "H.264 (AVC)",
+  "@h264": {
+    "description": "Códec de video: H.264"
+  },
+
+  "h265": "H.265 (HEVC)",
+  "@h265": {
+    "description": "Códec de video: H.265"
   },
 
   "selected": "{count,plural, =0{No seleccionados} =1{1 seleccionado} other{{count} seleccionados}}",

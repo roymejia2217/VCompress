@@ -24,6 +24,9 @@ class ProcessPage extends ConsumerStatefulWidget {
 }
 
 class _ProcessPageState extends ConsumerState<ProcessPage> {
+  static const double _estimatedItemHeight = 72.0;
+  final ScrollController _scrollController = ScrollController();
+  final Map<String, GlobalKey> _itemKeys = {};
   int _currentTaskIndex = 0;
   bool _done = false;
   bool _cancelled = false;
@@ -43,6 +46,7 @@ class _ProcessPageState extends ConsumerState<ProcessPage> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     AppLogger.performanceEnd('video_processing');
     super.dispose();
   }
@@ -66,6 +70,13 @@ class _ProcessPageState extends ConsumerState<ProcessPage> {
               if (_currentTaskIndex != currentIndex) {
                 setState(() {
                   _currentTaskIndex = currentIndex;
+                });
+                // Usar microtask para asegurar que el frame se ha renderizado si es necesario
+                // o simplemente llamar al scroll.
+                // Al ser un cambio de estado, el build sucederá, pero _scrollToIndex
+                // maneja la lógica de items no renderizados.
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) _scrollToIndex(currentIndex);
                 });
               }
 
@@ -103,6 +114,83 @@ class _ProcessPageState extends ConsumerState<ProcessPage> {
         await HapticFeedback.heavyImpact();
       }
     }
+  }
+
+  /// Desplaza la lista de manera inteligente para mantener visible el item actual
+  void _scrollToIndex(int index) {
+    if (!_scrollController.hasClients) return;
+
+    final tasks = ref.read(tasksProvider);
+    if (index < 0 || index >= tasks.length) return;
+
+    final taskId = tasks[index].id.toString();
+    final key = _itemKeys[taskId];
+    final context = key?.currentContext;
+
+    // Caso 1: El item ya está renderizado en el árbol de widgets
+    if (context != null) {
+      // Scrollable.ensureVisible es "inteligente":
+      // - Si el item ya es visible, no hace nada (cumple el requisito de no deslizar si ya se ve).
+      // - Si no es visible, hace el scroll mínimo necesario.
+      Scrollable.ensureVisible(
+        context,
+        duration: AppAnimations.long2,
+        curve: AppAnimations.emphasized,
+        alignment: 0.5, // Intenta centrarlo si es necesario moverlo, mejor visibilidad
+        alignmentPolicy:
+            ScrollPositionAlignmentPolicy.explicit, // Forza la alineación si mueve
+      );
+      return;
+    }
+
+    // Caso 2: El item NO está renderizado (está fuera del viewport/cache)
+    // Calculamos una posición estimada basada en el promedio de altura de los items visibles
+    final double avgHeight = _getAverageItemHeight();
+    double targetOffset = index * avgHeight;
+
+    // Aseguramos no pasarnos del máximo scroll posible
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    if (targetOffset > maxScroll) {
+      targetOffset = maxScroll;
+    }
+
+    // Evitamos scroll innecesario si ya estamos en el fondo y el target es mayor
+    // (aunque la validación de maxScroll ya ayuda, esto es explícito)
+    if (_scrollController.offset >= maxScroll && targetOffset >= maxScroll) {
+      return;
+    }
+
+    _scrollController.animateTo(
+      targetOffset,
+      duration: AppAnimations.long2,
+      curve: AppAnimations.emphasized,
+    );
+  }
+
+  /// Calcula la altura promedio de los items actualmente renderizados
+  double _getAverageItemHeight() {
+    double totalHeight = 0;
+    int count = 0;
+
+    for (final key in _itemKeys.values) {
+      final context = key.currentContext;
+      if (context != null) {
+        final renderBox = context.findRenderObject() as RenderBox?;
+        if (renderBox != null && renderBox.hasSize) {
+          totalHeight += renderBox.size.height;
+          count++;
+        }
+      }
+    }
+
+    // Si tenemos items renderizados, devolvemos el promedio real
+    if (count > 0) {
+      return totalHeight / count;
+    }
+
+    // Fallback de seguridad solo si no hay NADA renderizado (raro en este punto)
+    // Usamos una estimación basada en Material Design 3 Standard List Item height
+    return _estimatedItemHeight;
   }
 
   /// Cancela el procesamiento de video actual mostrando diálogo de confirmación
@@ -145,8 +233,9 @@ class _ProcessPageState extends ConsumerState<ProcessPage> {
   VideoPlaybackContext _determinePlaybackContext(VideoTask task) {
     // Si replaceOriginalFile está activado, el video final está en la ubicación original
     if (task.settings.editSettings.replaceOriginalFile) {
-      return VideoPlaybackContext
-          .processed; // outputPath apunta a la ubicación original con el video comprimido
+      // Usar 'original' para acceder a originalPath (que contiene el video reemplazado)
+      // en lugar de inputPath (que puede haber sido eliminado del caché)
+      return VideoPlaybackContext.original;
     }
 
     // Si no se reemplaza el archivo original, usar el video procesado normal
@@ -259,9 +348,7 @@ class _ProcessPageState extends ConsumerState<ProcessPage> {
               )
             : AppAppBar.withReturn(
                 title: AppLocalizations.of(context)!.compressing,
-                subtitle: AppLocalizations.of(
-                  context,
-                )!.videoProgress(_currentTaskIndex + 1, tasks.length),
+                subtitle: _buildSmartProgressSubtitle(context, tasks),
                 onBackPressed:
                     _cancel, // Acción custom: cancelar en lugar de pop
               ),
@@ -270,21 +357,57 @@ class _ProcessPageState extends ConsumerState<ProcessPage> {
     );
   }
 
+  /// Construye el subtítulo de progreso inteligente ignorando tareas canceladas
+  String _buildSmartProgressSubtitle(BuildContext context, List<VideoTask> tasks) {
+    // Total de tareas activas (no canceladas)
+    final activeTotal = tasks.where((t) => !t.isCancelled).length;
+    
+    // Posición actual relativa solo a tareas activas
+    // Filtramos las tareas hasta el índice actual (_currentTaskIndex) que no estén canceladas
+    final activeCurrent = tasks
+        .take(_currentTaskIndex + 1) // Tomar hasta la tarea actual (inclusive)
+        .where((t) => !t.isCancelled)
+        .length;
+
+    // Si no hay tareas activas (ej: todas canceladas), mostrar estado genérico o 0/0
+    if (activeTotal == 0) {
+      return AppLocalizations.of(context)!.videoProgress(0, 0);
+    }
+
+    // Asegurar que activeCurrent no sea 0 si hay activeTotal (mínimo 1 si estamos procesando)
+    final displayCurrent = activeCurrent > 0 ? activeCurrent : 1;
+
+    return AppLocalizations.of(context)!.videoProgress(
+      displayCurrent,
+      activeTotal,
+    );
+  }
+
   /// Construye lista de tareas mostrando progreso de cada video durante compresión
   Widget _buildProcessingView(List<VideoTask> tasks) {
     return Padding(
       padding: AppPadding.m,
       child: ListView.builder(
+        controller: _scrollController,
         itemCount: tasks.length,
         addRepaintBoundaries: true, // Aísla repaints por elemento
         itemBuilder: (context, index) {
           final task = tasks[index];
 
+          // Asignar una GlobalKey única para cada tarea
+          // Usamos putIfAbsent para mantener la misma key a través de rebuilds
+          final key = _itemKeys.putIfAbsent(
+            task.id.toString(),
+            () => GlobalKey(debugLabel: 'task_${task.id}'),
+          );
+
           // Widget optimizado que solo se reconstruye cuando cambia su tarea específica
           return VideoTaskListItem(
-            key: ValueKey(task.id), // Key única para identificar cada tarea
+            key: key, // Usamos la GlobalKey para el tracking de scroll
             taskId: task.id.toString(),
-            onCancelPressed: !_cancelled ? () => _cancel() : null,
+            onCancelPressed: !_cancelled
+                ? () => ref.read(tasksProvider.notifier).cancelTask(task.id)
+                : null,
           );
         },
       ),
