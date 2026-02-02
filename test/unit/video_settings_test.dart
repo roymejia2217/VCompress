@@ -12,7 +12,7 @@ void main() {
       // Assert
       expect(settings.algorithm, equals(CompressionAlgorithm.excelenteCalidad));
       expect(settings.codec, equals(VideoCodec.h264));
-      expect(settings.resolution, equals(OutputResolution.original));
+      expect(settings.scale, equals(1.0));
       expect(settings.removeAudio, isFalse);
       expect(settings.format, equals(OutputFormat.mp4));
       expect(settings.editSettings.enableVolume, isFalse);
@@ -24,7 +24,7 @@ void main() {
       const settings = VideoSettings(
         algorithm: CompressionAlgorithm.buenaCalidad,
         codec: VideoCodec.h265,
-        resolution: OutputResolution.p720,
+        scale: 0.7,
         removeAudio: true,
         format: OutputFormat.mkv,
       );
@@ -32,7 +32,7 @@ void main() {
       // Assert
       expect(settings.algorithm, equals(CompressionAlgorithm.buenaCalidad));
       expect(settings.codec, equals(VideoCodec.h265));
-      expect(settings.resolution, equals(OutputResolution.p720));
+      expect(settings.scale, equals(0.7));
       expect(settings.removeAudio, isTrue);
       expect(settings.format, equals(OutputFormat.mkv));
     });
@@ -44,13 +44,13 @@ void main() {
       // Act
       final modified = original.copyWith(
         algorithm: CompressionAlgorithm.maximaCalidad,
-        resolution: OutputResolution.p1080,
+        scale: 0.5,
         removeAudio: true,
       );
 
       // Assert
       expect(modified.algorithm, equals(CompressionAlgorithm.maximaCalidad));
-      expect(modified.resolution, equals(OutputResolution.p1080));
+      expect(modified.scale, equals(0.5));
       expect(modified.removeAudio, isTrue);
       expect(modified.format, equals(original.format)); // Unchanged
       expect(modified.codec, equals(original.codec)); // Unchanged
@@ -60,7 +60,7 @@ void main() {
       // Arrange
       final settings = VideoSettings.defaults().copyWith(
         algorithm: CompressionAlgorithm.buenaCalidad,
-        resolution: OutputResolution.p720,
+        scale: 0.8,
         codec: VideoCodec.h264,
       );
 
@@ -72,7 +72,7 @@ void main() {
       expect(compression['video']['algorithm'], equals('buenaCalidad'));
       // 'codec' stores the codec enum name (e.g., 'h264')
       expect(compression['video']['codec'], equals('h264'));
-      expect(compression['video']['resolution'], equals('720'));
+      expect(compression['video']['scale'], equals(0.8));
       expect(compression['video']['removeAudio'], isFalse);
       expect(compression['edit'], isNotEmpty);
     });
@@ -136,7 +136,7 @@ void main() {
       const mediumQuality = VideoSettings(
         algorithm: CompressionAlgorithm.compresionMedia,
         codec: VideoCodec.h264,
-        resolution: OutputResolution.original,
+        scale: 1.0,
         removeAudio: false,
         format: OutputFormat.mp4,
       );
@@ -150,7 +150,7 @@ void main() {
       // Arrange
       final settings = VideoSettings.defaults().copyWith(
         algorithm: CompressionAlgorithm.buenaCalidad, // preset: 'fast'
-        resolution: OutputResolution.p720,
+        scale: 0.5,
         removeAudio: true,
         codec: VideoCodec.h264, // libx264
       );
@@ -161,7 +161,8 @@ void main() {
       // Assert
       expect(command, contains('libx264')); // Codec
       expect(command, contains('-preset fast')); // Preset for buenaCalidad
-      expect(command, contains('scale=-2:720'));
+      // scale filter for 0.5: scale=trunc(iw*0.50/2)*2:trunc(ih*0.50/2)*2
+      expect(command, contains('scale=trunc(iw*0.50/2)*2:trunc(ih*0.50/2)*2'));
       expect(command, contains('-an')); // no audio
       expect(command, contains('-f mp4'));
     });

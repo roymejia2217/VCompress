@@ -263,15 +263,11 @@ class AppVideoPlayer {
 
   /// Helper para lógica de processed path
   static String _getProcessedPath(VideoTask task) {
-    // CORRECTO - Lógica completa con null safety
+    // FIX CRÍTICO: Si se reemplaza el archivo original, el "processed video"
+    // es ahora el archivo en la ubicación original (originalPath).
+    // NO el inputPath, ya que inputPath es una copia en caché que se elimina.
     if (task.settings.editSettings.replaceOriginalFile) {
-      // Si se reemplaza original Y ya está completado
-      if (task.isCompleted) {
-        // El inputPath ahora contiene el video procesado (original reemplazado)
-        return task.inputPath;
-      }
-      // Durante procesamiento, usar inputPath (original antes de reemplazo)
-      return task.inputPath;
+      return task.originalPath ?? task.inputPath;
     }
 
     // Si NO se reemplaza, usar outputPath o fallback a originalPath

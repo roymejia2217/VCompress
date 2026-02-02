@@ -5,41 +5,6 @@ import 'package:vcompressor/models/algorithm.dart';
 import 'package:vcompressor/models/video_codec.dart';
 import 'package:vcompressor/utils/format_utils.dart';
 
-enum OutputResolution {
-  original('Original'),
-  p1080('1080p'),
-  p720('720p'),
-  p480('480p'),
-  p360('360p'),
-  p240('240p'),
-  p144('144p');
-
-  const OutputResolution(this.label);
-  final String label;
-}
-
-extension OutputResolutionX on OutputResolution {
-  /// Returns FFmpeg scale height keeping aspect ratio (-2 for width)
-  String? get scaleHeightArg {
-    switch (this) {
-      case OutputResolution.original:
-        return null;
-      case OutputResolution.p1080:
-        return '1080';
-      case OutputResolution.p720:
-        return '720';
-      case OutputResolution.p480:
-        return '480';
-      case OutputResolution.p360:
-        return '360';
-      case OutputResolution.p240:
-        return '240';
-      case OutputResolution.p144:
-        return '144';
-    }
-  }
-}
-
 enum OutputFormat {
   mp4('MP4'),
   avi('AVI'),
@@ -184,7 +149,7 @@ class VideoEditSettings {
 class VideoSettings {
   final CompressionAlgorithm algorithm;
   final VideoCodec codec;
-  final OutputResolution resolution;
+  final double scale;
   final bool removeAudio;
   final OutputFormat format;
   final VideoEditSettings editSettings;
@@ -192,7 +157,7 @@ class VideoSettings {
   const VideoSettings({
     required this.algorithm,
     required this.codec,
-    required this.resolution,
+    required this.scale,
     required this.removeAudio,
     required this.format,
     this.editSettings = const VideoEditSettings(),
@@ -201,7 +166,7 @@ class VideoSettings {
   factory VideoSettings.defaults() => const VideoSettings(
     algorithm: CompressionAlgorithm.excelenteCalidad,
     codec: VideoCodec.h264,
-    resolution: OutputResolution.original,
+    scale: 1.0,
     removeAudio: false,
     format: OutputFormat.mp4,
     editSettings: VideoEditSettings(),
@@ -210,7 +175,7 @@ class VideoSettings {
   VideoSettings copyWith({
     CompressionAlgorithm? algorithm,
     VideoCodec? codec,
-    OutputResolution? resolution,
+    double? scale,
     bool? removeAudio,
     OutputFormat? format,
     VideoEditSettings? editSettings,
@@ -218,7 +183,7 @@ class VideoSettings {
     return VideoSettings(
       algorithm: algorithm ?? this.algorithm,
       codec: codec ?? this.codec,
-      resolution: resolution ?? this.resolution,
+      scale: scale ?? this.scale,
       removeAudio: removeAudio ?? this.removeAudio,
       format: format ?? this.format,
       editSettings: editSettings ?? this.editSettings,
@@ -232,7 +197,7 @@ class VideoSettings {
       'video': {
         'algorithm': algorithm.name,
         'codec': codec.name,
-        'resolution': resolution.scaleHeightArg,
+        'scale': scale,
         'format': format.extension,
         'removeAudio': removeAudio,
       },
@@ -280,15 +245,15 @@ class VideoSettings {
     final parts = <String>[
       '-c:v ${codec.ffmpegName}',
       '-preset ${algorithm.preset}',
-      if (resolution.scaleHeightArg != null)
-        '-vf scale=-2:${resolution.scaleHeightArg}',
+      if (scale < 1.0)
+        '-vf scale=trunc(iw*${scale.toStringAsFixed(2)}/2)*2:trunc(ih*${scale.toStringAsFixed(2)}/2)*2',
       '-f ${format.name}',
       if (removeAudio) '-an',
       if (editSettings['enableSpeed'] as bool)
         '-filter:v "setpts=${1 / (editSettings['speed'] as double)}*PTS"',
       if (editSettings['enableMirror'] as bool) '-vf hflip',
       if (editSettings['enableSquareFormat'] as bool)
-        '-vf "crop=min(iw\\,ih):min(iw\\,ih)"',
+        '-vf "crop=min(iw\,ih):min(iw\,ih)"',
     ];
 
     return parts.where((part) => part.isNotEmpty).join(' ');
@@ -297,7 +262,7 @@ class VideoSettings {
   // hashCode para detección de cambios en configuración
   @override
   int get hashCode =>
-      Object.hash(algorithm, codec, resolution, removeAudio, format, editSettings);
+      Object.hash(algorithm, codec, scale, removeAudio, format, editSettings);
 
   @override
   bool operator ==(Object other) =>
@@ -306,7 +271,7 @@ class VideoSettings {
           runtimeType == other.runtimeType &&
           algorithm == other.algorithm &&
           codec == other.codec &&
-          resolution == other.resolution &&
+          scale == other.scale &&
           removeAudio == other.removeAudio &&
           format == other.format &&
           editSettings == other.editSettings;

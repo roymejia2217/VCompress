@@ -221,7 +221,7 @@ class SettingsPage extends ConsumerWidget {
                             ),
                             onTap: () async {
                               await ref
-                                  .read(saveDirNotifierProvider.notifier)
+                                  .read(saveDirProvider.notifier)
                                   .pickDirectory();
                             },
                           ),

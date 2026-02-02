@@ -27,6 +27,11 @@ class AppVideoListItem extends ConsumerWidget {
   final String? tooltip;
   final VoidCallback? onDeleteComplete;
   final bool isSelected;
+  
+  /// Progreso visual en tiempo real (0.0 - 1.0)
+  /// Si se proporciona, anula el progreso almacenado en el VideoTask.
+  /// Usado para evitar rebuilds masivos durante la compresión.
+  final double? progressOverride;
 
   const AppVideoListItem({
     super.key,
@@ -40,6 +45,7 @@ class AppVideoListItem extends ConsumerWidget {
     this.onTap,
     this.tooltip,
     this.isSelected = false,
+    this.progressOverride,
   });
 
   // Factory helper para results (compatibilidad API)
@@ -69,6 +75,7 @@ class AppVideoListItem extends ConsumerWidget {
     VoidCallback? onCancelPressed,
     VoidCallback? onTap,
     String? tooltip,
+    double? progressOverride,
   }) : this(
          key: key,
          taskId: taskId,
@@ -76,6 +83,7 @@ class AppVideoListItem extends ConsumerWidget {
          onCancelPressed: onCancelPressed,
          onTap: onTap,
          tooltip: tooltip,
+         progressOverride: progressOverride,
        );
 
   @override
@@ -281,9 +289,18 @@ class AppVideoListItem extends ConsumerWidget {
       }
     } else {
       // Standard/compact: Info completa
+      // Generar texto de resolución basado en escala
+      String resolutionText;
+      if (task.settings.scale == 1.0) {
+        resolutionText = AppLocalizations.of(context)!.original;
+      } else {
+        final percentage = (task.settings.scale * 100).round();
+        resolutionText = '$percentage%';
+      }
+
       subtitleLines.add(
         Text(
-          '${getLocalizedAlgorithmName(task.settings.algorithm, context)} · ${getLocalizedResolutionLabel(task.settings.resolution, context)} · ${getLocalizedFormatLabel(task.settings.format, context)}',
+          '${getLocalizedAlgorithmName(task.settings.algorithm, context)} · $resolutionText · ${getLocalizedFormatLabel(task.settings.format, context)}',
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -329,6 +346,9 @@ class AppVideoListItem extends ConsumerWidget {
   ) {
     // Material 3: Estados visuales diferenciados
     final taskState = task.state as VideoTaskState;
+    
+    // Usar override si existe, si no fallback al task
+    final displayProgress = progressOverride ?? task.displayProgress;
 
     return switch (taskState) {
       VideoTaskState.pending => Text(
@@ -347,7 +367,7 @@ class AppVideoListItem extends ConsumerWidget {
             // Texto de progreso
             Text(
               AppLocalizations.of(context)!.percentCompleted(
-                (task.displayProgress * 100).toStringAsFixed(0),
+                (displayProgress * 100).toStringAsFixed(0),
               ),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface,
@@ -361,7 +381,7 @@ class AppVideoListItem extends ConsumerWidget {
               curve: Curves.easeOut, // M3 recomienda ease-out
               tween: Tween<double>(
                 begin: 0,
-                end: task.displayProgress.clamp(0.0, 1.0),
+                end: displayProgress.clamp(0.0, 1.0),
               ),
               builder: (context, animatedProgress, _) {
                 return LinearProgressIndicator(

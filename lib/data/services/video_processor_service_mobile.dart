@@ -147,10 +147,12 @@ class VideoProcessorServiceMobile implements VideoProcessorService {
       // SOLID: Iniciar servicio de progreso simplificado
       _progressService.startProgress();
 
-      AppLogger.debug(
-        'Iniciando procesamiento: ${task.fileName}',
-        tag: 'VideoProcessor',
-      );
+      if (kDebugMode) {
+        AppLogger.debug(
+          'Iniciando procesamiento: ${task.fileName}',
+          tag: 'VideoProcessor',
+        );
+      }
 
       final session = await FFmpegKit.executeAsync(
         cmd,
@@ -160,10 +162,13 @@ class VideoProcessorServiceMobile implements VideoProcessorService {
           if (ReturnCode.isSuccess(returnCode)) {
             onProgress(1.0); // GARANTIZAR 100%
             onTimeEstimate(null); // Limpiar estimación al completar
-            AppLogger.debug(
-              'FFmpeg completed successfully',
-              tag: 'VideoProcessor',
-            );
+            
+            if (kDebugMode) {
+              AppLogger.debug(
+                'FFmpeg completed successfully',
+                tag: 'VideoProcessor',
+              );
+            }
           } else if (ReturnCode.isCancel(returnCode)) {
             AppLogger.info('FFmpeg cancelled by user', tag: 'VideoProcessor');
           } else {
@@ -177,13 +182,15 @@ class VideoProcessorServiceMobile implements VideoProcessorService {
         },
         (log) {
           // SOLID: Solo usar logs para información de debug
-          final logMessage = log.getMessage();
-          if (logMessage.contains('Duration:') ||
-              logMessage.contains('time=')) {
-            AppLogger.debug(
-              'FFmpeg log: ${logMessage.substring(0, math.min(100, logMessage.length))}...',
-              tag: 'VideoProcessor',
-            );
+          if (kDebugMode) {
+            final logMessage = log.getMessage();
+            if (logMessage.contains('Duration:') ||
+                logMessage.contains('time=')) {
+              AppLogger.debug(
+                'FFmpeg log: ${logMessage.substring(0, math.min(100, logMessage.length))}...',
+                tag: 'VideoProcessor',
+              );
+            }
           }
         },
         (statistics) {
@@ -206,10 +213,13 @@ class VideoProcessorServiceMobile implements VideoProcessorService {
           onProgress(progress);
           onTimeEstimate(_progressService.calculateTimeRemaining());
 
-          AppLogger.debug(
-            'Progreso: ${(progress * 100).toStringAsFixed(1)}% en ${currentTimeSeconds.toStringAsFixed(1)}s',
-            tag: 'VideoProcessor',
-          );
+          // Performance: Logging solo en debug para evitar interpolación costosa en hot loop
+          if (kDebugMode) {
+            AppLogger.debug(
+              'Progreso: ${(progress * 100).toStringAsFixed(1)}% en ${currentTimeSeconds.toStringAsFixed(1)}s',
+              tag: 'VideoProcessor',
+            );
+          }
         },
       );
 
@@ -247,11 +257,13 @@ class VideoProcessorServiceMobile implements VideoProcessorService {
     // SOLID: Progreso directo basado en duración del video
     final progress = (currentTimeSeconds / videoDuration).clamp(0.0, 0.99);
 
-    AppLogger.debug(
-      'Progreso calculado: ${(progress * 100).toStringAsFixed(1)}% '
-      '(${currentTimeSeconds.toStringAsFixed(1)}s/${videoDuration.toStringAsFixed(1)}s)',
-      tag: 'VideoProcessor',
-    );
+    if (kDebugMode) {
+      AppLogger.debug(
+        'Progreso calculado: ${(progress * 100).toStringAsFixed(1)}% '
+        '(${currentTimeSeconds.toStringAsFixed(1)}s/${videoDuration.toStringAsFixed(1)}s)',
+        tag: 'VideoProcessor',
+      );
+    }
 
     return progress;
   }

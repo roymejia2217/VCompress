@@ -13,52 +13,11 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:vcompressor/l10n/app_localizations.dart';
 
 /// Modal UNIFICADO para configuración de video (individual y batch)
-///
-/// **ARQUITECTURA:**
-/// -  SafeArea + SingleChildScrollView + Column(mainAxisSize.min)
-/// -  Se ajusta dinámicamente al contenido (ExpansionTile colapsa/expande)
-/// -  NO usa DraggableScrollableSheet (reserva espacio fijo, inadecuado para contenido dinámico)
-///
-/// **MIGRACIÓN MATERIAL 3:**
-/// - Unifica video_config_modal.dart + batch_config_modal.dart (900 líneas → 350 líneas)
-/// - Elimina tooltips con question icons (anti-patrón M3)
-/// - Usa description inline en AppToggle (M3 supporting text)
-/// - Elimina iconos redundantes en SegmentedButtons (compacidad)
-/// - Elimina leading icons en toggles (semantic colors suficientes)
-/// - Usa spacing tokens M3 (AppSpacing.s = 8dp, AppSpacing.m = 16dp)
-/// - Usa typography M3 (titleLarge en vez de fontSize manual)
-/// - Optimiza rebuilds con .select() de Riverpod
-///
-/// **MODO DE USO:**
-/// ```dart
-/// // Batch mode (aplica a múltiples videos)
-/// showModalBottomSheet(
-///   context: context,
-///   isScrollControlled: true, //  REQUERIDO
-///   builder: (_) => const VideoConfigModal(), // task = null
-/// );
-///
-/// // Individual mode (aplica a un video específico)
-/// showModalBottomSheet(
-///   context: context,
-///   isScrollControlled: true, //  REQUERIDO
-///   builder: (_) => VideoConfigModal(task: selectedTask),
-/// );
-/// ```
-///
-/// **REFERENCIAS M3:**
-/// - Bottom sheets: https://m3.material.io/components/bottom-sheets/overview
-/// - Typography: https://developer.android.com/develop/ui/compose/designsystems/material3
-/// - Spacing: https://m3.material.io/foundations/layout/understanding-layout/spacing
-/// - Supporting text: https://m3.material.io/components/text-fields/guidelines
 class VideoConfigModal extends ConsumerWidget {
   const VideoConfigModal({this.task, super.key});
 
-  /// Video task para configuración individual.
-  /// Si es null → modo batch (configuración para múltiples videos).
   final VideoTask? task;
 
-  /// Indica si está en modo batch (múltiples videos)
   bool get _isBatchMode => task == null;
 
   @override
@@ -66,24 +25,19 @@ class VideoConfigModal extends ConsumerWidget {
     final theme = Theme.of(context);
     final videoCount = _isBatchMode ? ref.watch(tasksProvider).length : 1;
 
-    // M3 PATTERN: Modal simple que se ajusta al contenido dinámico
-    // NO usar DraggableScrollableSheet para contenido variable (ExpansionTile)
     return SafeArea(
-      // Protege de notch/status bar, pero NO bottom (manejado manualmente)
       top: true,
-      bottom: false, // Manual para incluir design tokens
+      bottom: false,
       child: SingleChildScrollView(
-        // Scroll solo si contenido excede altura disponible
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            AppSpacing.m, // 16dp - M3 container padding
+            AppSpacing.m,
             AppSpacing.m,
             AppSpacing.m,
             MediaQuery.of(context).padding.bottom + AppSpacing.m,
           ),
           child: Column(
-            mainAxisSize:
-                MainAxisSize.min, // CRÍTICO: Se ajusta al contenido real
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ═══ HEADER ═══
@@ -93,17 +47,28 @@ class VideoConfigModal extends ConsumerWidget {
                         context,
                       )!.configurationBatch(videoCount)
                     : AppLocalizations.of(context)!.configurationTitle,
-                style: theme.textTheme.titleLarge, // M3 typography
+                style: theme.textTheme.titleLarge,
               ),
-              const SizedBox(height: 12), // M3 spacing: título → contenido
+              const SizedBox(height: 12),
+              
               // ═══ NIVEL 1: ESENCIAL (80% usuarios) ═══
-              _buildAlgorithmSelector(context, ref),
-              const SizedBox(height: AppSpacing.s),
-              _buildResolutionSelector(context, ref),
-              const SizedBox(height: AppSpacing.s),
-              _buildFormatSelector(context, ref),
+              
+              // Preset + Format en la misma fila (Petición usuario)
+              Row(
+                children: [
+                  Expanded(child: _buildAlgorithmSelector(context, ref)),
+                  const SizedBox(width: AppSpacing.s),
+                  Expanded(child: _buildFormatSelector(context, ref)),
+                ],
+              ),
+              
+              const SizedBox(height: AppSpacing.m),
+              
+              // Slider de Escala (Sustituye a Resolución fija)
+              _buildScaleSlider(context, ref),
 
-              const SizedBox(height: 12), // Separador de grupo
+              const SizedBox(height: 12),
+              
               // Grupo: Opciones básicas de salida
               _buildAudioToggle(context, ref),
               const SizedBox(height: AppSpacing.s),
@@ -114,7 +79,7 @@ class VideoConfigModal extends ConsumerWidget {
               // ═══ NIVEL 2: AVANZADO (20% usuarios) ═══
               _buildAdvancedExpansion(context, ref),
 
-              const SizedBox(height: AppSpacing.m), // Separación antes de botón
+              const SizedBox(height: AppSpacing.m),
               // Botón de acción
               _buildActionButton(context, ref),
             ],
@@ -125,7 +90,6 @@ class VideoConfigModal extends ConsumerWidget {
   }
 
   Widget _buildAlgorithmSelector(BuildContext context, WidgetRef ref) {
-    // .select() para rebuild solo cuando algorithm cambia
     final algorithm = _isBatchMode
         ? ref.watch(batchAlgorithmProvider)
         : ref.watch(videoAlgorithmProvider(task!));
@@ -155,6 +119,95 @@ class VideoConfigModal extends ConsumerWidget {
     );
   }
 
+  Widget _buildFormatSelector(BuildContext context, WidgetRef ref) {
+    final format = _isBatchMode
+        ? ref.watch(batchFormatProvider)
+        : ref.watch(videoFormatProvider(task!));
+
+    return DropdownMenu<OutputFormat>(
+      expandedInsets: EdgeInsets.zero,
+      enableSearch: false,
+      initialSelection: format,
+      dropdownMenuEntries: OutputFormat.values
+          .map(
+            (fmt) => DropdownMenuEntry<OutputFormat>(
+              value: fmt,
+              label: getLocalizedFormatLabel(fmt, context),
+            ),
+          )
+          .toList(),
+      onSelected: (value) {
+        if (value != null) {
+          _isBatchMode
+              ? ref.read(batchConfigProvider.notifier).updateFormat(value)
+              : ref
+                    .read(videoConfigProvider(task!).notifier)
+                    .updateFormat(value);
+        }
+      },
+      label: Text(AppLocalizations.of(context)!.outputFormat),
+    );
+  }
+
+  /// Slider de escala M3 (0.1 a 1.0)
+  Widget _buildScaleSlider(BuildContext context, WidgetRef ref) {
+    final scale = _isBatchMode
+        ? ref.watch(batchScaleProvider)
+        : ref.watch(videoScaleProvider(task!));
+
+    final theme = Theme.of(context);
+    final percentage = (scale * 100).round();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              // "Resolución (Escala)" o similar. Usamos string hardcoded por falta de key,
+              // pero idealmente deberíamos agregar 'resolutionScale' al ARB.
+              // Usamos 'outputResolution' existente para mantener compatibilidad.
+              "${AppLocalizations.of(context)!.outputResolution}: $percentage%",
+              style: theme.textTheme.titleSmall,
+            ),
+            if (task != null && task!.videoWidth != null && task!.videoHeight != null)
+              Text(
+                "${(task!.videoWidth! * scale).round()}x${(task!.videoHeight! * scale).round()}",
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+          ],
+        ),
+        Slider(
+          value: scale,
+          min: 0.1,
+          max: 1.0,
+          divisions: 18, // Pasos de 5% (0.1, 0.15 ... 1.0) -> 90 / 5 = 18 pasos
+          label: "$percentage%",
+          onChanged: (value) {
+            _isBatchMode
+                ? ref.read(batchConfigProvider.notifier).updateScale(value)
+                : ref
+                      .read(videoConfigProvider(task!).notifier)
+                      .updateScale(value);
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("10%", style: theme.textTheme.labelSmall),
+              Text("Original", style: theme.textTheme.labelSmall),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildCodecToggle(BuildContext context, WidgetRef ref) {
     final enableCodec = _isBatchMode
         ? ref.watch(batchEnableCodecProvider)
@@ -170,10 +223,7 @@ class VideoConfigModal extends ConsumerWidget {
 
     final capabilities = ref.watch(hardwareCapabilitiesProvider).valueOrNull;
 
-    // Solo mostrar H264 y H265 en el selector
     final options = [VideoCodec.h264, VideoCodec.h265];
-    
-    // Si el formato es WebM, deshabilitar la opción (solo soporta VP9 por ahora)
     final isFormatCompatible = format != OutputFormat.webm;
 
     return Column(
@@ -184,26 +234,21 @@ class VideoConfigModal extends ConsumerWidget {
           value: enableCodec && isFormatCompatible,
           onChanged: isFormatCompatible ? (newValue) {
             if (newValue) {
-              // Si se activa, mantener el codec actual o default a h264 si es auto
               final newCodec = codec == VideoCodec.auto ? VideoCodec.h264 : codec;
               _isBatchMode
                   ? ref.read(batchConfigProvider.notifier).updateCodecSettings(true)
                   : ref.read(videoConfigProvider(task!).notifier).updateCodecSettings(true);
-                  
-              // Asegurar que tenemos un codec válido seleccionado
               _isBatchMode
                   ? ref.read(batchConfigProvider.notifier).updateCodec(newCodec)
                   : ref.read(videoConfigProvider(task!).notifier).updateCodec(newCodec);
             } else {
-              // Si se desactiva
               _isBatchMode
                   ? ref.read(batchConfigProvider.notifier).updateCodecSettings(false)
                   : ref.read(videoConfigProvider(task!).notifier).updateCodecSettings(false);
             }
-          } : null, // Disabled si el formato no es compatible
+          } : null,
         ),
 
-        // Selector de Codec con animación
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
@@ -269,68 +314,7 @@ class VideoConfigModal extends ConsumerWidget {
     );
   }
 
-  Widget _buildResolutionSelector(BuildContext context, WidgetRef ref) {
-    final resolution = _isBatchMode
-        ? ref.watch(batchResolutionProvider)
-        : ref.watch(videoResolutionProvider(task!));
-
-    return DropdownMenu<OutputResolution>(
-      expandedInsets: EdgeInsets.zero,
-      enableSearch: false,
-      initialSelection: resolution,
-      dropdownMenuEntries: OutputResolution.values
-          .map(
-            (res) => DropdownMenuEntry<OutputResolution>(
-              value: res,
-              label: getLocalizedResolutionLabel(res, context),
-            ),
-          )
-          .toList(),
-      onSelected: (value) {
-        if (value != null) {
-          _isBatchMode
-              ? ref.read(batchConfigProvider.notifier).updateResolution(value)
-              : ref
-                    .read(videoConfigProvider(task!).notifier)
-                    .updateResolution(value);
-        }
-      },
-      label: Text(AppLocalizations.of(context)!.outputResolution),
-    );
-  }
-
-  Widget _buildFormatSelector(BuildContext context, WidgetRef ref) {
-    final format = _isBatchMode
-        ? ref.watch(batchFormatProvider)
-        : ref.watch(videoFormatProvider(task!));
-
-    return DropdownMenu<OutputFormat>(
-      expandedInsets: EdgeInsets.zero,
-      enableSearch: false,
-      initialSelection: format,
-      dropdownMenuEntries: OutputFormat.values
-          .map(
-            (fmt) => DropdownMenuEntry<OutputFormat>(
-              value: fmt,
-              label: getLocalizedFormatLabel(fmt, context),
-            ),
-          )
-          .toList(),
-      onSelected: (value) {
-        if (value != null) {
-          _isBatchMode
-              ? ref.read(batchConfigProvider.notifier).updateFormat(value)
-              : ref
-                    .read(videoConfigProvider(task!).notifier)
-                    .updateFormat(value);
-        }
-      },
-      label: Text(AppLocalizations.of(context)!.outputFormat),
-    );
-  }
-
   Widget _buildAudioToggle(BuildContext context, WidgetRef ref) {
-    // .select() para rebuild solo cuando isMuted cambia
     final audioSettings = _isBatchMode
         ? ref.watch(batchAudioProvider)
         : ref.watch(videoAudioProvider(task!));
@@ -344,8 +328,8 @@ class VideoConfigModal extends ConsumerWidget {
             ? ref
                   .read(batchConfigProvider.notifier)
                   .updateAudioSettings(
-                    true, // enableVolume siempre true
-                    newValue, // isMuted cambia según el toggle
+                    true,
+                    newValue,
                   )
             : ref
                   .read(videoConfigProvider(task!).notifier)
@@ -453,7 +437,6 @@ class VideoConfigModal extends ConsumerWidget {
           },
         ),
 
-        // Selector de FPS con animación
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
@@ -474,14 +457,14 @@ class VideoConfigModal extends ConsumerWidget {
                   child: SegmentedButton<int>(
                     style: const ButtonStyle(
                       visualDensity:
-                          VisualDensity.compact, // M3 compact density
+                          VisualDensity.compact,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     segments: fpsOptions
                         .map(
                           (fps) => ButtonSegment(
                             value: fps,
-                            label: Text('$fps'), // Label-only, sin iconos
+                            label: Text('$fps'),
                           ),
                         )
                         .toList(),
@@ -497,7 +480,7 @@ class VideoConfigModal extends ConsumerWidget {
                                   .updateFpsSettings(true, selection.first);
                       }
                     },
-                    showSelectedIcon: false, // Sin checkmark para compacidad
+                    showSelectedIcon: false,
                   ),
                 ),
               ),
@@ -546,7 +529,6 @@ class VideoConfigModal extends ConsumerWidget {
           },
         ),
 
-        // Selector de velocidad con animación
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
@@ -566,7 +548,7 @@ class VideoConfigModal extends ConsumerWidget {
                   width: double.infinity,
                   child: SegmentedButton<double>(
                     style: const ButtonStyle(
-                      visualDensity: VisualDensity.compact, // M3
+                      visualDensity: VisualDensity.compact,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     segments: speedOptions
@@ -580,7 +562,6 @@ class VideoConfigModal extends ConsumerWidget {
                                   ? '.5x'
                                   : '${speedOption.toInt()}x',
                             ),
-                            // ELIMINADO: icon (ruido visual en espacio compacto)
                           ),
                         )
                         .toList(),
@@ -596,7 +577,7 @@ class VideoConfigModal extends ConsumerWidget {
                                   .updateSpeedSettings(true, selection.first);
                       }
                     },
-                    showSelectedIcon: false, // Compacidad
+                    showSelectedIcon: false,
                   ),
                 ),
               ),
@@ -614,13 +595,11 @@ class VideoConfigModal extends ConsumerWidget {
           child: FilledButton.icon(
             onPressed: () {
               if (_isBatchMode) {
-                // Modo batch: aplicar configuración a todos los videos
                 final batchSettings = ref.read(batchConfigProvider);
                 ref
                     .read(tasksProvider.notifier)
                     .updateAllSettings(batchSettings);
               } else {
-                // Modo individual: actualizar solo este video
                 final currentSettings = ref.read(videoConfigProvider(task!));
                 ref
                     .read(tasksProvider.notifier)
@@ -641,42 +620,24 @@ class VideoConfigModal extends ConsumerWidget {
     );
   }
 
-  /// ═══ NIVEL 2: AVANZADO (20% usuarios) ═══
-  /// ExpansionTile con opciones avanzadas usando progressive disclosure M3
   Widget _buildAdvancedExpansion(BuildContext context, WidgetRef ref) {
     return ExpansionTile(
-      // Title + Subtitle descriptivos
       title: Text(AppLocalizations.of(context)!.advancedOptions),
       subtitle: Text(AppLocalizations.of(context)!.advancedSubtitle),
-
-      // Sin padding extra (modal ya tiene padding)
       tilePadding: EdgeInsets.zero,
       childrenPadding: const EdgeInsets.only(bottom: 8),
-
-      // Configuración de expansión
-      initiallyExpanded: false, // 80/20 rule
-      maintainState: true, // Preserva estado de toggles
-      visualDensity: VisualDensity.compact, // Compacto para modales
-      // Chevron por defecto (showTrailingIcon: true es default)
-      // NO leading icon (redundante)
+      initiallyExpanded: false,
+      maintainState: true,
+      visualDensity: VisualDensity.compact,
       children: [
-        // Toggle 1: Modo espejo
         _buildMirrorToggle(context, ref),
         const SizedBox(height: AppSpacing.s),
-
-        // Toggle 2: Formato cuadrado
         _buildSquareFormatToggle(context, ref),
         const SizedBox(height: AppSpacing.s),
-
-        // Codec Toggle
         _buildCodecToggle(context, ref),
         const SizedBox(height: AppSpacing.s),
-
-        // FPS Selector
         _buildFpsToggle(context, ref),
         const SizedBox(height: AppSpacing.s),
-
-        // Speed Slider
         _buildSpeedToggle(context, ref),
       ],
     );

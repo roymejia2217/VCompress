@@ -118,7 +118,7 @@ void main() {
       // Act
       final newSettings = VideoSettings.defaults().copyWith(
         algorithm: CompressionAlgorithm.maximaCalidad,
-        resolution: OutputResolution.p1080,
+        scale: 0.5,
       );
       controller.updateSettings(1, newSettings);
       final updatedTasks = container.read(tasksProvider);
@@ -126,8 +126,8 @@ void main() {
       // Assert
       expect(updatedTasks.first.settings.algorithm,
           equals(CompressionAlgorithm.maximaCalidad));
-      expect(updatedTasks.first.settings.resolution,
-          equals(OutputResolution.p1080));
+      expect(updatedTasks.first.settings.scale,
+          equals(0.5));
     });
 
     test('should update all settings (batch operation)', () {

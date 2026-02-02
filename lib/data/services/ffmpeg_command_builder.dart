@@ -99,15 +99,19 @@ class FFmpegCommandBuilder {
     final filters = <String>[];
     final editSettings = task.settings.editSettings;
 
-    // Resolución
-    final scaleHeight = task.settings.resolution.scaleHeightArg;
-    if (scaleHeight != null) {
-      filters.add('scale=-2:$scaleHeight');
+    // Escala (Resolución) - Punto 4 Optimización
+    // Si la escala es menor a 1.0, aplicamos el filtro de escalado
+    if (task.settings.scale < 1.0) {
+      // Usamos trunc(iw*scale/2)*2 para asegurar dimensiones pares (requerido por muchos codecs)
+      final s = task.settings.scale.toStringAsFixed(2);
+      filters.add('scale=trunc(iw*$s/2)*2:trunc(ih*$s/2)*2');
     }
 
     // Formato cuadrado 1:1
     if (editSettings.enableSquareFormat) {
-      filters.add('crop=min(iw\\,ih):min(iw\\,ih)');
+      // Usamos raw string para evitar advertencias de escape innecesario en Dart,
+      // pero mantenemos el escape para FFmpeg (coma escapada)
+      filters.add(r'crop=min(iw\,ih):min(iw\,ih)');
     }
 
     // Espejo horizontal
@@ -181,13 +185,15 @@ class FFmpegCommandBuilder {
         ? task.settings.codec 
         : VideoCodec.h264;
 
-    String videoCodec;
+    String videoCodecName;
     String audioCodec;
+    VideoCodec effectiveCodecModel = selectedCodec; // Para cálculo de bitrate
 
     // 1. Determinar el codec de video base
     // Si el formato es WebM, forzamos VP9
     if (format == OutputFormat.webm) {
-      videoCodec = 'libvpx-vp9';
+      videoCodecName = 'libvpx-vp9';
+      effectiveCodecModel = VideoCodec.vp9;
     } else {
       // Para otros formatos (MP4, MKV, MOV), usamos la selección del usuario
       // Determinar si podemos usar hardware
@@ -201,32 +207,36 @@ class FFmpegCommandBuilder {
           case VideoCodec.h264:
             if (hwCapabilities.hasH264HwEncoder) {
               useHardware = true;
-              videoCodec = 'h264_mediacodec';
+              videoCodecName = 'h264_mediacodec';
+              effectiveCodecModel = VideoCodec.h264;
             } else {
-              videoCodec = selectedCodec.ffmpegName;
+              videoCodecName = selectedCodec.ffmpegName;
             }
             break;
             
           case VideoCodec.h265:
             if (hwCapabilities.hasH265HwEncoder) {
               useHardware = true;
-              videoCodec = 'hevc_mediacodec';
+              videoCodecName = 'hevc_mediacodec';
+              effectiveCodecModel = VideoCodec.h265;
             } else {
-              videoCodec = selectedCodec.ffmpegName;
+              videoCodecName = selectedCodec.ffmpegName;
             }
             break;
             
           default:
-            videoCodec = selectedCodec.ffmpegName;
+            videoCodecName = selectedCodec.ffmpegName;
+            effectiveCodecModel = selectedCodec;
             break;
         }
       } else {
         // Forzado software o plataforma no Android
-        videoCodec = selectedCodec.ffmpegName;
+        videoCodecName = selectedCodec.ffmpegName;
+        effectiveCodecModel = selectedCodec;
       }
       
       AppLogger.debug(
-        'Codec seleccionado: ${selectedCodec.name}, Hardware: $useHardware -> $videoCodec',
+        'Codec seleccionado: ${selectedCodec.name}, Hardware: $useHardware -> $videoCodecName',
         tag: 'FFmpegCommandBuilder',
       );
     }
@@ -248,25 +258,38 @@ class FFmpegCommandBuilder {
         break;
     }
 
-    final args = <String>['-c:v', videoCodec];
+    final args = <String>['-c:v', videoCodecName];
 
     // 3. Parámetros específicos del codec (CRF vs Bitrate)
-    if (videoCodec == 'libvpx-vp9') {
+    if (videoCodecName == 'libvpx-vp9') {
       args.addAll(['-crf', '${algorithm.crfValue}', '-b:v', '0']);
-    } else if (videoCodec.contains('mediacodec')) {
-      // FIX: Encoders de hardware en Android (MediaCodec) usan Bitrate (-b:v), ignoran CRF
-      final resolutionHeight =
-          int.tryParse(task.settings.resolution.scaleHeightArg ?? '720') ?? 720;
+    } else if (videoCodecName.contains('mediacodec')) {
+      // FIX: Hardware Encoders (MediaCodec) usan Bitrate (-b:v).
+      // Ahora usamos lógica INTELIGENTE de bitrate.
       
+      // Calcular altura objetivo basada en la escala
+      // Usamos 1080p como base si no tenemos info, o la altura del video si la tenemos
+      // Como task.videoHeight puede ser null, usamos un default razonable (720p)
+      final baseHeight = task.videoHeight ?? 720;
+      final targetHeight = (baseHeight * task.settings.scale).round();
+      
+      // Determinar FPS efectivos para el cálculo
+      final effectiveFps = task.settings.editSettings.enableFps 
+          ? (task.settings.editSettings.targetFps?.toDouble() ?? 30.0)
+          : (task.originalFps ?? 30.0);
+
       final bitrate = await algorithm.getRecommendedBitrate(
-        resolutionHeight: resolutionHeight,
+        resolutionHeight: targetHeight,
         outputFormat: format.name,
+        codec: effectiveCodecModel, // Pasamos el codec real (H.264 o H.265)
+        fps: effectiveFps, // Pasamos los FPS para ajuste de fluidez
       );
       
       args.addAll(['-b:v', '$bitrate']);
       
       AppLogger.debug(
-        'Configurando bitrate por hardware: ${(bitrate / 1000000).toStringAsFixed(2)} Mbps',
+        'Bitrate Inteligente: ${(bitrate / 1000000).toStringAsFixed(2)} Mbps '
+        '(H=${targetHeight}p [Scale ${task.settings.scale}], Codec=${effectiveCodecModel.name}, FPS=${effectiveFps.toStringAsFixed(0)})',
         tag: 'FFmpegCommandBuilder',
       );
     } else {
@@ -281,9 +304,6 @@ class FFmpegCommandBuilder {
 
     // 4. Codec de audio
     // Solo aplicar si no hay filtros de audio que requieran re-encoding
-    // Ojo: Si el formato es MP4 y audio es copy, ffmpeg puede quejarse si el source no es compatible
-    // Pero 'aac' es seguro para MP4.
-    
     final hasAudioFilters =
         task.settings.editSettings.enableSpeed &&
         task.settings.editSettings.speed != 1.0;

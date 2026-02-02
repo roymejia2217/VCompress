@@ -55,8 +55,13 @@ class _ProcessPageState extends ConsumerState<ProcessPage> {
     if (!mounted || _cancelled) return;
 
     try {
-      // LINUX FIX: Esperar a que saveDirProvider se resuelva completamente
-      final saveDir = await ref.read(saveDirProvider.future);
+      // LINUX FIX: Obtener directorio de guardado del estado actual
+      final saveDirState = ref.read(saveDirProvider);
+      final saveDir = saveDirState.valueOrNull;
+
+      if (saveDir == null) {
+        throw Exception('Directorio de guardado no inicializado');
+      }
 
       if (!mounted || _cancelled) return;
       await ref

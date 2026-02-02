@@ -25,9 +25,9 @@ final batchCodecProvider = Provider<VideoCodec>(
   (ref) => ref.watch(batchConfigProvider.select((settings) => settings.codec)),
 );
 
-final batchResolutionProvider = Provider<OutputResolution>(
+final batchScaleProvider = Provider<double>(
   (ref) =>
-      ref.watch(batchConfigProvider.select((settings) => settings.resolution)),
+      ref.watch(batchConfigProvider.select((settings) => settings.scale)),
 );
 
 final batchFormatProvider = Provider<OutputFormat>(

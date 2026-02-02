@@ -8,9 +8,10 @@ class FFprobeService {
   const FFprobeService();
 
   /// Extrae información completa del video usando MediaInformation API
+  /// Retorna un mapa con datos procesados (FPS y duración como double)
   /// SOLID: Single Responsibility - extrae toda la información multimedia de una vez
   /// DRY: Centraliza la obtención de metadatos en un solo método robusto
-  Future<Map<String, dynamic>?> _getMediaInformation(String videoPath) async {
+  Future<Map<String, dynamic>?> getMediaInformation(String videoPath) async {
     try {
       AppLogger.debug(
         'Obteniendo información multimedia: $videoPath',
@@ -35,16 +36,20 @@ class FFprobeService {
 
       // Extraer información general
       final durationMs = information.getDuration();
-      final duration = durationMs != null ? double.parse(durationMs) : null;
+      final duration = durationMs != null ? double.tryParse(durationMs) : null;
 
       // Extraer información de streams
-      final streams = information.getStreams();
-      String? fps;
+      double? fps;
       int? width, height;
 
+      final streams = information.getStreams();
       for (var stream in streams) {
         if (stream.getType() == 'video') {
-          fps = stream.getAverageFrameRate();
+          // Parsear FPS directamente aquí
+          final fpsStr = stream.getAverageFrameRate();
+          if (fpsStr != null) {
+            fps = _parseFpsFromString(fpsStr);
+          }
           width = stream.getWidth();
           height = stream.getHeight();
           break;
@@ -53,7 +58,7 @@ class FFprobeService {
 
       final result = {
         'duration': duration,
-        'fps': fps,
+        'fps': fps, // Ahora es double?
         'width': width,
         'height': height,
         'bitrate': information.getBitrate(),
@@ -62,7 +67,7 @@ class FFprobeService {
       };
 
       AppLogger.debug(
-        'Información extraída: ${width}x$height, ${duration?.toStringAsFixed(2)}s, ${fps}fps',
+        'Información extraída: ${width}x$height, ${duration?.toStringAsFixed(2)}s, ${fps?.toStringAsFixed(2)}fps',
         tag: 'FFprobeService',
       );
 
@@ -78,27 +83,16 @@ class FFprobeService {
 
   /// Extrae la duración del video usando MediaInformation API
   /// SOLID: Single Responsibility - solo extrae duración
-  /// DRY: Reutiliza _getMediaInformation para máxima eficiencia
+  /// DRY: Reutiliza getMediaInformation para máxima eficiencia
   Future<double?> getVideoDuration(String videoPath) async {
     try {
-      AppLogger.debug('Extrayendo duración: $videoPath', tag: 'FFprobeService');
-
-      final info = await _getMediaInformation(videoPath);
+      final info = await getMediaInformation(videoPath);
       if (info == null) return null;
 
       final duration = info['duration'] as double?;
       if (duration != null && _isValidDuration(duration)) {
-        AppLogger.debug(
-          'Duración extraída: ${duration.toStringAsFixed(2)}s',
-          tag: 'FFprobeService',
-        );
         return duration;
       }
-
-      AppLogger.warning(
-        'No se pudo extraer duración válida',
-        tag: 'FFprobeService',
-      );
       return null;
     } catch (e) {
       AppLogger.error('Error extrayendo duración: $e', tag: 'FFprobeService');
@@ -108,29 +102,16 @@ class FFprobeService {
 
   /// Extrae dimensiones del video usando MediaInformation API
   /// SOLID: Single Responsibility - solo extrae dimensiones
-  /// DRY: Reutiliza _getMediaInformation para máxima eficiencia
+  /// DRY: Reutiliza getMediaInformation para máxima eficiencia
   Future<Map<String, int?>> getVideoDimensions(String videoPath) async {
     try {
-      AppLogger.debug(
-        'Extrayendo dimensiones: $videoPath',
-        tag: 'FFprobeService',
-      );
-
-      final info = await _getMediaInformation(videoPath);
+      final info = await getMediaInformation(videoPath);
       if (info == null) return {'width': null, 'height': null};
 
-      final width = info['width'] as int?;
-      final height = info['height'] as int?;
-
-      if (width != null && height != null) {
-        AppLogger.debug(
-          'Dimensiones extraídas: ${width}x$height',
-          tag: 'FFprobeService',
-        );
-        return {'width': width, 'height': height};
-      }
-
-      return {'width': null, 'height': null};
+      return {
+        'width': info['width'] as int?,
+        'height': info['height'] as int?,
+      };
     } catch (e) {
       AppLogger.error(
         'Error extrayendo dimensiones: $e',
@@ -142,32 +123,13 @@ class FFprobeService {
 
   /// Extrae FPS del video usando MediaInformation API
   /// SOLID: Single Responsibility - solo extrae FPS
-  /// DRY: Reutiliza _getMediaInformation para máxima eficiencia
+  /// DRY: Reutiliza getMediaInformation para máxima eficiencia
   Future<double?> getVideoFps(String videoPath) async {
     try {
-      AppLogger.debug('Extrayendo FPS: $videoPath', tag: 'FFprobeService');
-
-      final info = await _getMediaInformation(videoPath);
+      final info = await getMediaInformation(videoPath);
       if (info == null) return null;
 
-      final fpsStr = info['fps'] as String?;
-      if (fpsStr == null || fpsStr.isEmpty) return null;
-
-      // Parsear FPS desde string (puede ser fracción o decimal)
-      final fps = _parseFpsFromString(fpsStr);
-      if (fps != null && fps > 0) {
-        AppLogger.debug(
-          'FPS extraído: ${fps.toStringAsFixed(2)}fps',
-          tag: 'FFprobeService',
-        );
-        return fps;
-      }
-
-      AppLogger.warning(
-        'No se pudo extraer FPS válido: $fpsStr',
-        tag: 'FFprobeService',
-      );
-      return null;
+      return info['fps'] as double?;
     } catch (e) {
       AppLogger.error('Error extrayendo FPS: $e', tag: 'FFprobeService');
       return null;

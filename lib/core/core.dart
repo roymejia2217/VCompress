@@ -10,4 +10,3 @@ export 'result/result.dart';
 export 'logging/app_logger.dart';
 export 'accessibility/app_semantics.dart';
 export 'performance/memory_manager.dart';
-export 'performance/image_optimizer.dart';

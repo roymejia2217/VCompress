@@ -3,6 +3,7 @@ package com.rjmejia.vcompressor
 import android.annotation.SuppressLint
 import android.content.Context
 import android.media.MediaCodecList
+import android.media.MediaScannerConnection
 import android.os.Build
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -15,6 +16,7 @@ import java.io.IOException
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.rjmejia.vcompressor/hardware_detection"
+    private val SCAN_CHANNEL = "com.rjmejia.vcompressor/media_scan"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -26,6 +28,7 @@ class MainActivity : FlutterActivity() {
         flutterEngine.plugins.add(com.rjmejia.vcompressor.plugins.MediaStoreUriResolverPlugin())
         flutterEngine.plugins.add(com.rjmejia.vcompressor.plugins.FileReplacementPlugin())
         
+        // Canal de detección de hardware
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "getHardwareInfo" -> {
@@ -54,6 +57,23 @@ class MainActivity : FlutterActivity() {
                 else -> {
                     result.notImplemented()
                 }
+            }
+        }
+
+        // Canal de escaneo de medios
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SCAN_CHANNEL).setMethodCallHandler { call, result ->
+            if (call.method == "scanFile") {
+                val path = call.argument<String>("path")
+                if (path != null) {
+                    MediaScannerConnection.scanFile(this, arrayOf(path), null) { _, uri ->
+                        // Escaneo completado
+                    }
+                    result.success(null)
+                } else {
+                    result.error("INVALID_PATH", "Path cannot be null", null)
+                }
+            } else {
+                result.notImplemented()
             }
         }
     }

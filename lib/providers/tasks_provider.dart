@@ -15,8 +15,10 @@ import 'package:vcompressor/data/services/file_system_helper.dart';
 import 'package:vcompressor/providers/loading_provider.dart';
 import 'package:vcompressor/providers/hardware_provider.dart';
 import 'package:vcompressor/providers/video_services_provider.dart';
+import 'package:vcompressor/providers/progress_provider.dart'; // Import nuevo provider
 import 'package:vcompressor/utils/cache_service.dart';
 import 'package:vcompressor/utils/format_utils.dart';
+import 'package:vcompressor/data/services/media_scanner_service.dart';
 
 final tasksProvider = StateNotifierProvider<TasksController, List<VideoTask>>((
   ref,
@@ -44,6 +46,7 @@ class TasksController extends StateNotifier<List<VideoTask>> {
   late final VideoProcessorService _processorService;
   late final FileReplacementService _fileReplacementService;
   late final MediaStoreUriResolver _uriResolver;
+  late final MediaScannerService _mediaScanner;
 
   // Helper centralizado para operaciones de filesystem
   static const _fsHelper = FileSystemHelper();
@@ -63,6 +66,7 @@ class TasksController extends StateNotifier<List<VideoTask>> {
     _processorService = _ref.read(videoProcessorServiceProvider);
     _fileReplacementService = const FileReplacementService();
     _uriResolver = const MediaStoreUriResolver();
+    _mediaScanner = MediaScannerService();
 
     _addFilesUseCase = AddVideoFilesUseCase(
       validationService: validationService,
@@ -303,11 +307,14 @@ class TasksController extends StateNotifier<List<VideoTask>> {
           task.settings,
         );
 
-        // Notificar progreso global (para AppBar subtitle)
+        // Notificar progreso global inicial (para AppBar subtitle)
         onProgress(i, state.length, 0.0, task.fileName);
 
-        // Iniciar progreso individual del task
-        updateTaskProgress(task.id, 0.01);
+        // PERFORMANCE FIX: 
+        // Actualizamos el estado del Task UNA VEZ a 'Processing' (progress > 0).
+        // Los updates subsiguientes (0.02, 0.03...) van al `taskProgressProvider` 
+        // para NO disparar rebuilds de la lista entera.
+        updateTaskProgress(task.id, 0.001); 
 
         // Comprimir con callback de progreso individual
         final result = await _compressUseCase.execute(task, outputPath, (
@@ -316,10 +323,12 @@ class TasksController extends StateNotifier<List<VideoTask>> {
           percent,
           fileName,
         ) {
-          // Actualizar solo este task
-          updateTaskProgress(task.id, percent);
+          // PERFORMANCE FIX: 
+          // Actualizar SOLO el provider de progreso, NO el estado de la lista.
+          // Esto evita notifyListeners() masivos.
+          _ref.read(taskProgressProvider(task.id).notifier).state = percent;
 
-          // Notificar progreso global para AppBar
+          // Notificar progreso global para AppBar (solo actualiza el contador si cambia index)
           onProgress(i, state.length, percent, fileName);
         }, onTimeEstimate: onTimeEstimate);
 
@@ -328,7 +337,6 @@ class TasksController extends StateNotifier<List<VideoTask>> {
         
         // Si fue cancelada individualmente durante la ejecución
         if (taskAfter.isCancelled) {
-          // Ya está marcada como cancelada por cancelTask(), no sobrescribir con error
            AppLogger.info(
             'Tarea cancelada durante ejecución: ${task.id}',
             tag: 'TasksController',
@@ -342,15 +350,45 @@ class TasksController extends StateNotifier<List<VideoTask>> {
         }
 
         if (result.isSuccess) {
-          // Task ya actualizado en execute(), marcar completado con datos finales
-          final completedTask = state.firstWhere((t) => t.id == task.id);
-          markTaskCompleted(
-            task.id,
-            completedTask.compressedSizeBytes!,
-            completedTask.outputPath!,
-          );
+          // Limpieza de provider de progreso (ya no es necesario)
+          _ref.read(taskProgressProvider(task.id).notifier).state = 1.0;
+
+          // DETERMINAR RUTA FINAL REAL (Robustez ante fallos de sync de estado)
+          String finalPath;
+          if (task.settings.editSettings.replaceOriginalFile) {
+             finalPath = task.originalPath ?? task.inputPath;
+          } else {
+             finalPath = outputPath;
+          }
+          
+          // VERIFICAR ARCHIVO
+          final file = File(finalPath);
+          int finalSize = 0;
+          
+          if (await file.exists()) {
+             finalSize = await file.length();
+             
+             // Escanear archivo para que aparezca en la galería
+             await _mediaScanner.scanFile(finalPath);
+             
+             markTaskCompleted(task.id, finalSize, finalPath);
+          } else {
+             // Fallback: Si el archivo no está en la ruta calculada, intentamos recuperar
+             // la ruta desde el estado (si el usecase la actualizó)
+             final completedTask = state.firstWhere((t) => t.id == task.id);
+             
+             if (completedTask.outputPath != null && await File(completedTask.outputPath!).exists()) {
+                markTaskCompleted(task.id, completedTask.compressedSizeBytes!, completedTask.outputPath!);
+             } else {
+                AppLogger.error('Archivo de salida NO encontrado: $finalPath', tag: 'TasksController');
+                markTaskError(task.id, "Error: Archivo de salida no encontrado.");
+             }
+          }
         } else {
-          // Marcar error (si no fue cancelación)
+          // Limpieza de provider de progreso
+           _ref.read(taskProgressProvider(task.id).notifier).state = 0.0;
+
+          // Marcar error en la lista
           markTaskError(
             task.id,
             result.error?.userMessage ?? 'Error desconocido',
@@ -378,6 +416,8 @@ class TasksController extends StateNotifier<List<VideoTask>> {
     try {
       AppLogger.debug('Eliminando tarea: $id', tag: 'TasksController');
       state = state.where((t) => t.id != id).toList(growable: false);
+      // Limpiar provider asociado si queda algo (buena práctica)
+      // Aunque autoDispose se encargaría si se usara, aquí es state explícito
     } catch (e) {
       AppLogger.error('Error eliminando tarea: $e', tag: 'TasksController');
     }
@@ -449,7 +489,8 @@ class TasksController extends StateNotifier<List<VideoTask>> {
     }
   }
 
-  /// Actualiza progreso de una tarea específica (0.0 a 1.0), ej: updateTaskProgress(5, 0.75)
+  /// Actualiza progreso de una tarea específica en el estado principal.
+  /// NOTA: Usar SOLO para cambios de estado (0 -> 0.01), no para streams continuos.
   void updateTaskProgress(int taskId, double progress) {
     try {
       state = state
@@ -587,10 +628,14 @@ class TasksController extends StateNotifier<List<VideoTask>> {
           temporaryFilePaths.add(task.inputPath);
         }
 
-        // Agregar thumbnailPath si está en caché temporal
+        // FIX: No eliminar thumbnails aquí. Los thumbnails deben persistir
+        // hasta que la tarea sea explícitamente eliminada o limpiada.
+        // Anteriormente esto causaba que los thumbnails desaparecieran después de la compresión.
+        /*
         if (task.thumbnailPath != null && _isCachePath(task.thumbnailPath!)) {
           temporaryFilePaths.add(task.thumbnailPath!);
         }
+        */
       }
 
       // Limpiar archivos específicos si hay alguno

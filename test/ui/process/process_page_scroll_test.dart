@@ -66,6 +66,16 @@ class TestTasksController extends TasksController {
   }
 }
 
+// Test SaveDirNotifier
+class TestSaveDirNotifier extends SaveDirNotifier {
+  TestSaveDirNotifier() : super() {
+    state = const AsyncValue.data('/tmp');
+  }
+
+  @override
+  Future<void> _initialize() async {}
+}
+
 void main() {
   group('ProcessPage Dynamic Scrolling', () {
     testWidgets('should scroll to reveal off-screen task when it becomes active', (
@@ -87,7 +97,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-             saveDirProvider.overrideWith((ref) => Future.value('/tmp')),
+             saveDirProvider.overrideWith((ref) => TestSaveDirNotifier()),
              
              // Override services read by TasksController constructor
              videoMetadataServiceProvider.overrideWithValue(FakeVideoMetadataService()), 

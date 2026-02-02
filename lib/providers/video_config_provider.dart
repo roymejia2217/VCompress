@@ -6,7 +6,6 @@ import 'package:vcompressor/models/video_codec.dart';
 import 'package:vcompressor/l10n/app_localizations.dart';
 
 /// Provider para manejar la configuración de video de manera optimizada
-/// Reemplaza el uso de ValueNotifier con Riverpod para mejor performance
 class VideoConfigNotifier extends StateNotifier<VideoSettings> {
   VideoConfigNotifier(super.initialSettings);
 
@@ -27,9 +26,9 @@ class VideoConfigNotifier extends StateNotifier<VideoSettings> {
     );
   }
 
-  /// Actualiza la resolución de salida
-  void updateResolution(OutputResolution resolution) {
-    state = state.copyWith(resolution: resolution);
+  /// Actualiza la escala de resolución (0.1 - 1.0)
+  void updateScale(double scale) {
+    state = state.copyWith(scale: scale.clamp(0.1, 1.0));
   }
 
   /// Actualiza el formato de salida
@@ -128,10 +127,10 @@ final videoCodecProvider = Provider.family<VideoCodec, VideoTask>(
   ),
 );
 
-/// Provider para obtener solo la resolución
-final videoResolutionProvider = Provider.family<OutputResolution, VideoTask>(
+/// Provider para obtener solo la escala de resolución
+final videoScaleProvider = Provider.family<double, VideoTask>(
   (ref, task) => ref.watch(
-    videoConfigProvider(task).select((settings) => settings.resolution),
+    videoConfigProvider(task).select((settings) => settings.scale),
   ),
 );
 
@@ -248,30 +247,6 @@ String getLocalizedAlgorithmName(
       return l10n.compresionMedia;
     case CompressionAlgorithm.ultraCompresion:
       return l10n.ultraCompresion;
-  }
-}
-
-/// Función para obtener la etiqueta localizada de la resolución
-String getLocalizedResolutionLabel(
-  OutputResolution resolution,
-  BuildContext context,
-) {
-  final l10n = AppLocalizations.of(context)!;
-  switch (resolution) {
-    case OutputResolution.original:
-      return l10n.original;
-    case OutputResolution.p1080:
-      return l10n.p1080;
-    case OutputResolution.p720:
-      return l10n.p720;
-    case OutputResolution.p480:
-      return l10n.p480;
-    case OutputResolution.p360:
-      return l10n.p360;
-    case OutputResolution.p240:
-      return l10n.p240;
-    case OutputResolution.p144:
-      return l10n.p144;
   }
 }
 

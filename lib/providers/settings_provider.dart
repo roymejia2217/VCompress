@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:vcompressor/core/constants/app_constants.dart';
 import 'package:vcompressor/utils/cache_service.dart';
 
@@ -19,103 +20,122 @@ final localeProvider = StateNotifierProvider<LocaleController, Locale>((ref) {
   return LocaleController();
 });
 
-// Provider mejorado usando FutureProvider para estado asíncrono
-final saveDirProvider = FutureProvider<String>((ref) async {
-  try {
-    final saved = await CacheService.instance.getSetting<String>('saveDir');
-
-    if (saved != null && saved.isNotEmpty) {
-      // Validar que el directorio existe
-      final dir = Directory(saved);
-      if (await dir.exists()) {
-        return saved;
-      }
-    }
-
-    // Crear directorio por defecto
-    return await _createDefaultSaveDir();
-  } catch (e) {
-    // Log error pero retorna un fallback válido
-    debugPrint('Error loading save directory: $e');
-
-    // Fallback seguro para Android
-    return '/storage/emulated/0/Download/${AppConstants.defaultSaveFolder}';
-  }
-});
-
-Future<String> _createDefaultSaveDir() async {
-  // Android: usar directorio de descargas externo
-  const defaultPath =
-      '/storage/emulated/0/Download/${AppConstants.defaultSaveFolder}';
-
-  // Crear directorio si no existe
-  final dir = Directory(defaultPath);
-  if (!await dir.exists()) {
-    await dir.create(recursive: true);
-  }
-
-  // Guardar en cache
-  await CacheService.instance.setSetting('saveDir', defaultPath);
-  return defaultPath;
-}
-
-// Notifier para cambiar directorio
-final saveDirNotifierProvider =
+// Provider unificado y reactivo para el directorio de guardado
+final saveDirProvider =
     StateNotifierProvider<SaveDirNotifier, AsyncValue<String>>((ref) {
-      return SaveDirNotifier(ref);
+      return SaveDirNotifier();
     });
 
 class SaveDirNotifier extends StateNotifier<AsyncValue<String>> {
-  final Ref _ref;
+  final Future<String?> Function()? _directoryPicker;
 
-  SaveDirNotifier(this._ref) : super(const AsyncValue.loading()) {
+  SaveDirNotifier({Future<String?> Function()? directoryPicker})
+    : _directoryPicker = directoryPicker,
+      super(const AsyncValue.loading()) {
     _initialize();
   }
 
   Future<void> _initialize() async {
     try {
-      final currentDir = await _ref.read(saveDirProvider.future);
-      state = AsyncValue.data(currentDir);
+      // 1. Intentar recuperar configuración guardada
+      final saved = await CacheService.instance.getSetting<String>('saveDir');
+
+      if (saved != null && saved.isNotEmpty) {
+        final dir = Directory(saved);
+        if (await dir.exists()) {
+          state = AsyncValue.data(saved);
+          return;
+        }
+      }
+
+      // 2. Si no hay guardado o no existe, generar default
+      final defaultDir = await _createDefaultSaveDir();
+      state = AsyncValue.data(defaultDir);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }
   }
 
+  Future<String> _createDefaultSaveDir() async {
+    try {
+      Directory? baseDir;
+      if (Platform.isAndroid) {
+        // Intenta obtener directorio de descargas público de manera segura
+        // Nota: path_provider en Android para getDownloadsDirectory puede ser null
+        // Usamos un enfoque híbrido seguro
+        baseDir = Directory('/storage/emulated/0/Download');
+        if (!await baseDir.exists()) {
+           baseDir = await getExternalStorageDirectory();
+        }
+      } else {
+        baseDir = await getDownloadsDirectory();
+      }
+
+      final path =
+          baseDir != null
+              ? '${baseDir.path}/${AppConstants.defaultSaveFolder}'
+              : '${Directory.systemTemp.path}/${AppConstants.defaultSaveFolder}';
+
+      final dir = Directory(path);
+      if (!await dir.exists()) {
+        await dir.create(recursive: true);
+      }
+
+      // Persistir el default generado
+      await CacheService.instance.setSetting('saveDir', path);
+      return path;
+    } catch (e) {
+      // Fallback extremo si todo falla (ej. permisos muy restrictivos)
+      return Directory.systemTemp.path;
+    }
+  }
+
   Future<void> pickDirectory() async {
+    // Preservar estado actual en caso de cancelación
+    final previousState = state;
+    
+    // UI Loading state inmediato
     state = const AsyncValue.loading();
 
     try {
-      final result = await FilePicker.platform.getDirectoryPath();
+      final result = _directoryPicker != null 
+          ? await _directoryPicker!() 
+          : await FilePicker.platform.getDirectoryPath();
 
       if (result == null || result.isEmpty) {
-        // Usuario canceló - restaurar estado anterior
-        final currentDir = await _ref.read(saveDirProvider.future);
-        state = AsyncValue.data(currentDir);
+        // Usuario canceló - restaurar sin error
+        state = previousState;
         return;
       }
 
-      // Validar permisos de escritura
-      final testFile = File('$result/.vcompress_test');
-      try {
-        await testFile.writeAsString('test');
-        await testFile.delete();
-      } catch (e) {
-        throw Exception('No se tienen permisos de escritura en: $result');
-      }
-
-      // Crear directorio si no existe
+      // Crear directorio si no existe (robustez)
       final dir = Directory(result);
       if (!await dir.exists()) {
         await dir.create(recursive: true);
       }
 
-      await CacheService.instance.setSetting('saveDir', result);
+      // Validar permisos de escritura
+      final testFile = File('$result/.vcompress_write_check');
+      try {
+        await testFile.writeAsString('test');
+        await testFile.delete();
+      } catch (e) {
+        throw const FileSystemException(
+          'Sin permisos de escritura en la carpeta seleccionada.',
+        );
+      }
+
+      // Actualización Optimista: Actualizar estado ANTES de persistir para UI rápida
       state = AsyncValue.data(result);
 
-      // Invalidar el provider principal para que se actualice
-      _ref.invalidate(saveDirProvider);
+      // Persistir en segundo plano
+      await CacheService.instance.setSetting('saveDir', result);
+      
     } catch (e, stack) {
+      // Si falla, mostrar error pero mantener estado previo accesible si se recarga
       state = AsyncValue.error(e, stack);
+      // Opcional: Podríamos revertir al estado previo tras un delay, 
+      // pero mostrar el error es más informativo.
     }
   }
 }
@@ -184,5 +204,3 @@ class LocaleController extends StateNotifier<Locale> {
     await CacheService.instance.setSetting('locale', locale.languageCode);
   }
 }
-
-// SaveDirController eliminado - reemplazado por AsyncNotifier

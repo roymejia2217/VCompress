@@ -39,7 +39,7 @@ void main() {
       // Act 2: Configure settings
       final newSettings = VideoSettings.defaults().copyWith(
         algorithm: CompressionAlgorithm.buenaCalidad,
-        resolution: OutputResolution.p720,
+        scale: 0.5,
       );
       controller.updateSettings(1, newSettings);
 
