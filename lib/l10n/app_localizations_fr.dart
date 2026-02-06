@@ -36,38 +36,38 @@ class AppLocalizationsFr extends AppLocalizations {
   String get french => 'Français';
 
   @override
-  String get italian => 'Italiano';
+  String get italian => 'Italien';
 
   @override
   String get storage => 'Stockage';
 
   @override
-  String get loadingSettings => 'Cargando configuración...';
+  String get loadingSettings => 'Chargement des paramètres...';
 
   @override
-  String get errorLoadingSettings => 'Error al cargar configuración';
+  String get errorLoadingSettings => 'Erreur lors du chargement des paramètres';
 
   @override
-  String get retry => 'Reintentar';
+  String get retry => 'Réessayer';
 
   @override
   String saveFolderSemantics(String path) {
-    return 'Carpeta de guardado configurada como $path';
+    return 'Dossier de sauvegarde défini sur $path';
   }
 
   @override
-  String get changeFolderSemantics => 'Cambiar carpeta de guardado';
+  String get changeFolderSemantics => 'Changer le dossier de sauvegarde';
 
   @override
-  String get changeFolderHint => 'Activa para seleccionar nueva carpeta';
+  String get changeFolderHint => 'Activer pour sélectionner un nouveau dossier';
 
   @override
   String invalidFilesCount(int count) {
-    return 'Archivos no válidos: $count';
+    return 'Fichiers invalides : $count';
   }
 
   @override
-  String get view => 'Ver';
+  String get view => 'Voir';
 
   @override
   String get light => 'Clair';
@@ -396,4 +396,24 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get uriResolutionFailed =>
       'Impossible d\'obtenir le chemin d\'accès d\'origine, le chemin temporaire sera utilisé';
+
+  @override
+  String resolutionScale(int percentage) {
+    return 'Résolution de sortie : $percentage%';
+  }
+
+  @override
+  String get scale10Percent => '10 %';
+
+  @override
+  String get scaleOriginal => 'Original';
+
+  @override
+  String get hardwareAccelerationAvailable =>
+      'Accélération matérielle disponible';
+
+  @override
+  String timeRemaining(String time) {
+    return '$time restants';
+  }
 }

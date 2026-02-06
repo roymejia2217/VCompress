@@ -10,9 +10,6 @@ import 'package:vcompressor/ui/widgets/app_icons.dart';
 import 'package:vcompressor/ui/widgets/notifications/notifications.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-// Importar AppIconSizes para tamaños de iconos
-import 'package:vcompressor/core/constants/app_design_tokens.dart';
-
 /// Enumeraciones para el sistema unificado de reproducción de videos
 enum VideoPlayerType {
   external, // Abrir con aplicación externa (open_file)
@@ -480,7 +477,7 @@ class _AppVideoThumbnail extends StatelessWidget {
           ),
           child: Icon(
             PhosphorIconsFill.play,
-            size: AppIconSize.m,
+            size: tokens.AppIconSize.m,
             color: colorScheme.onInverseSurface,
           ),
         ),

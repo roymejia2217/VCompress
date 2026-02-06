@@ -1,3 +1,5 @@
+import 'package:vcompressor/l10n/app_localizations.dart';
+
 /// Utilidades centralizadas para formateo de datos
 class FormatUtils {
   FormatUtils._(); // Constructor privado para clase estática
@@ -36,36 +38,20 @@ class FormatUtils {
     return '${ratio.toStringAsFixed(1)}%';
   }
 
-  /// Formatea velocidad de procesamiento
-  static String formatSpeed(double speed) {
-    if (speed == 1.0) return 'Normal';
-    if (speed < 1.0) return '${speed.toStringAsFixed(2)}x más lento';
-    return '${speed.toStringAsFixed(1)}x más rápido';
-  }
-
-  /// Limpia nombres de archivo reemplazando caracteres problemáticos
-  static String cleanFileName(String fileName) {
-    return fileName
-        .replaceAll(RegExp(r'\s+'), '-') // Reemplazar espacios con guiones
-        .replaceAll(
-          RegExp(r'[^\w\-\.]'),
-          '',
-        ) // Remover caracteres especiales excepto guiones y puntos
-        .replaceAll(
-          RegExp(r'-+'),
-          '-',
-        ) // Reemplazar múltiples guiones con uno solo
-        .replaceAll(RegExp(r'^-|-$'), ''); // Remover guiones al inicio y final
-  }
-
   /// Formatea tiempo estimado restante
-  static String formatTimeEstimate(Duration remaining) {
+  /// Requiere [AppLocalizations] para texto localizado
+  static String formatTimeEstimate(
+    Duration remaining,
+    AppLocalizations l10n,
+  ) {
+    String timeString;
     if (remaining.inSeconds < 60) {
-      return '${remaining.inSeconds}s restantes';
+      timeString = '${remaining.inSeconds}s';
     } else if (remaining.inMinutes < 60) {
-      return '${remaining.inMinutes}m restantes';
+      timeString = '${remaining.inMinutes}m';
     } else {
-      return '${remaining.inHours}h restantes';
+      timeString = '${remaining.inHours}h';
     }
+    return l10n.timeRemaining(timeString);
   }
 }

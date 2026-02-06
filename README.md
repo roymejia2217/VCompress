@@ -137,94 +137,48 @@ Thumbnails:         Video Thumbnail 0.5.6
 
 ```
 lib/
-├── core/                              # Core application logic
-│   ├── constants/
-│   │   ├── app_constants.dart        # Global constants
-│   │   └── app_design_tokens.dart    # M3 spacing, padding, colors
-│   ├── error/
-│   │   └── app_error.dart            # Centralized error handling
-│   ├── performance/
-│   │   └── memory_manager.dart       # Memory monitoring and optimization
-│   └── result/
-│       └── result.dart               # Generic Result<T, E> type
+├── core/                              # Core architecture & utilities
+│   ├── accessibility/                # Accessibility helpers
+│   ├── constants/                    # Constants, design tokens, animations
+│   ├── error/                        # Error handling & definitions
+│   ├── extensions/                   # Dart extensions
+│   ├── hardware/                     # Hardware detection logic
+│   ├── logging/                      # Logging utilities
+│   ├── performance/                  # Memory management
+│   ├── result/                       # Result type pattern
+│   ├── services/                     # Core services
+│   └── validation/                   # Validation logic
 │
-├── data/                              # Data layer and services
-│   ├── repositories/                 # Data repositories
-│   └── services/                     # 15 specialized services
-│       ├── FFmpeg Services
-│       │   ├── ffmpeg_command_builder.dart
-│       │   ├── ffmpeg_progress_service.dart
-│       │   ├── ffprobe_service.dart
-│       │   ├── video_processor_service.dart
-│       │   └── video_processor_service_mobile.dart
-│       │
-│       ├── Video Metadata & Validation
-│       │   ├── video_metadata_service.dart
-│       │   ├── video_metadata_service_mobile.dart
-│       │   └── video_validation_service.dart
-│       │
-│       ├── File & System Management
-│       │   ├── file_replacement_service.dart
-│       │   ├── file_system_helper.dart
-│       │   ├── media_store_uri_resolver.dart
-│       │   └── notification_service.dart
-│       │
-│       └── Hardware & Progress Tracking
-│           ├── hardware_detection_service.dart
-│           ├── platform_hardware_service.dart
-│           └── progress_tracker_service.dart
+├── data/                              # Data layer implementation
+│   ├── repositories/                 # Repository implementations
+│   └── services/                     # Data services (FFmpeg, MediaStore, etc.)
 │
-├── domain/                            # Business logic and use cases
-│   └── usecases/
-│       └── add_video_files_usecase.dart
+├── domain/                            # Domain layer (Business Logic)
+│   ├── models/                       # Domain models
+│   ├── repositories/                 # Repository interfaces
+│   └── usecases/                     # Application use cases
 │
-├── models/                            # Data models
-│   ├── video_task.dart               # Video compression task
-│   ├── video_settings.dart           # Compression settings
-│   ├── hardware_info.dart            # Device capabilities
-│   └── compression_result.dart       # Processing results
+├── l10n/                              # Localization files (.arb)
 │
-├── providers/                         # Riverpod state management (8 providers)
-│   ├── batch_config_provider.dart    # Batch processing configuration
-│   ├── error_handler_provider.dart   # Global error handling
-│   ├── hardware_provider.dart        # Device capabilities
-│   ├── loading_provider.dart         # Loading states and progress
-│   ├── settings_provider.dart        # User preferences (theme, locale, storage)
-│   ├── tasks_provider.dart           # Video task queue management
-│   ├── video_config_provider.dart    # Individual video compression settings
-│   └── video_services_provider.dart  # Service providers
+├── models/                            # Shared data models
+│
+├── providers/                         # State management (Riverpod)
 │
 ├── router/                            # Navigation configuration
-│   └── app_router.dart               # GoRouter setup with routes
 │
-├── theme/                             # Material 3 theming
-│   └── app_theme.dart                # Theme configuration (light/dark)
+├── services/                          # Global services (Permissions)
 │
-├── ui/                                # User interface
-│   ├── hardware/                     # Hardware information display
-│   ├── home/                         # Main page (video list, import)
-│   ├── process/                      # Video processing page
-│   ├── settings/                     # Settings and preferences
-│   ├── theme/                        # Theme utilities
-│   ├── video/                        # Video-specific widgets
-│   └── widgets/                      # Reusable components
-│       ├── app_app_bar.dart          # Custom app bar
-│       ├── app_icons.dart            # Icon wrapper
-│       ├── app_spacing.dart          # Spacing helper
-│       ├── video_config_modal.dart   # Configuration modal
-│       └── [other widgets]
+├── ui/                                # User Interface (Widgets & Pages)
+│   ├── home/                         # Home screen
+│   ├── process/                      # Processing screen
+│   ├── settings/                     # Settings screen
+│   ├── theme/                        # Theme configuration
+│   └── widgets/                      # Reusable widgets
 │
-├── utils/                             # Utility functions
-│   └── cache_service.dart            # In-memory and disk caching
+├── utils/                             # General utilities
 │
-├── l10n/                              # Localization
-│   ├── app_localizations.dart        # Generated localizations
-│   ├── app_es.arb                    # Spanish translations
-│   ├── app_en.arb                    # English translations
-│   └── app_fr.arb                    # French translations
-│
-├── l10n.yaml                         # Localization configuration
-└── main.dart                         # Application entry point
+└── main.dart                          # Application entry point
+```
 
 android/                               # Android-specific configuration
 ├── app/src/main/

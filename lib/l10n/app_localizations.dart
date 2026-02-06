@@ -779,6 +779,36 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'No se pudo obtener la ruta original, se usará ruta temporal'**
   String get uriResolutionFailed;
+
+  /// Etiqueta para el slider de resolución con porcentaje
+  ///
+  /// In es, this message translates to:
+  /// **'Resolución de salida: {percentage}%'**
+  String resolutionScale(int percentage);
+
+  /// Etiqueta para marca de escala 10%
+  ///
+  /// In es, this message translates to:
+  /// **'10%'**
+  String get scale10Percent;
+
+  /// Etiqueta para marca de escala Original
+  ///
+  /// In es, this message translates to:
+  /// **'Original'**
+  String get scaleOriginal;
+
+  /// Tooltip para códecs acelerados por hardware
+  ///
+  /// In es, this message translates to:
+  /// **'Aceleración por hardware disponible'**
+  String get hardwareAccelerationAvailable;
+
+  /// Mensaje de tiempo restante
+  ///
+  /// In es, this message translates to:
+  /// **'{time} restantes'**
+  String timeRemaining(String time);
 }
 
 class _AppLocalizationsDelegate

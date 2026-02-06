@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:vcompressor/core/logging/app_logger.dart';
-import 'package:vcompressor/utils/format_utils.dart';
 
 /// Punto de progreso para cálculo de estimación temporal
 class ProgressPoint {
@@ -64,7 +63,7 @@ class FFmpegProgressService {
   
   /// Calcula el tiempo restante usando la fórmula propuesta
   /// DRY: Implementa la fórmula matemática simple y efectiva
-  String? calculateTimeRemaining() {
+  Duration? calculateTimeRemaining() {
     if (_progressHistory.isEmpty || _lastReportedProgress >= 1.0) {
       return null;
     }
@@ -85,9 +84,8 @@ class FFmpegProgressService {
     // Aplicar suavizado con media móvil si hay suficientes datos
     final smoothedSeconds = _applySmoothing(timeRemainingSeconds);
     
-    // Formatear resultado
-    final remaining = Duration(seconds: smoothedSeconds.round());
-    return FormatUtils.formatTimeEstimate(remaining);
+    // Retornar duración
+    return Duration(seconds: smoothedSeconds.round());
   }
   
   /// Calcula tiempo restante usando la fórmula matemática propuesta

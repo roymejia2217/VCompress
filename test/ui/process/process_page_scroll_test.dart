@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,20 +7,42 @@ import 'package:vcompressor/providers/settings_provider.dart';
 import 'package:vcompressor/providers/video_services_provider.dart';
 import 'package:vcompressor/providers/loading_provider.dart';
 import 'package:vcompressor/providers/hardware_provider.dart';
+import 'package:vcompressor/providers/progress_provider.dart';
 import 'package:vcompressor/models/video_task.dart';
-import 'package:vcompressor/models/algorithm.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vcompressor/l10n/app_localizations.dart';
 import 'package:vcompressor/data/services/video_metadata_service.dart';
 import 'package:vcompressor/data/services/video_processor_service.dart';
+import 'package:vcompressor/core/result/result.dart';
+import 'package:vcompressor/core/error/app_error.dart';
 
-// Manual Mocks to replace Mockito
+// Mock robusto para evitar NoSuchMethodError en llamadas void/Future
 class FakeVideoMetadataService implements VideoMetadataService {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+// Mock robusto que implementa los métodos críticos
 class FakeVideoProcessorService implements VideoProcessorService {
+  @override
+  Future<Result<void, AppError>> processVideo({
+    required VideoTask task,
+    required String outputPath,
+    required void Function(double) onProgress,
+    required void Function(Duration?) onTimeEstimate,
+    bool useTemporaryFile = false,
+  }) async {
+    return const Success(null);
+  }
+
+  @override
+  void cancelCurrentProcess() {
+    // No-op for testing
+  }
+
+  @override
+  bool get isProcessing => false;
+  
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -33,33 +54,37 @@ class TestLoadingController extends LoadingController {
 
 // Test Controller
 class TestTasksController extends TasksController {
-  TestTasksController(super.ref);
+  // FIX: Declaramos explícitamente 'ref' para poder usarlo en esta subclase
+  final Ref ref; 
+
+  TestTasksController(this.ref) : super(ref);
 
   @override
   Future<void> compressAll({
     required String saveDir,
-    required void Function(
-      int currentIndex,
-      int total,
-      double percent,
-      String currentFileName,
-    )
-    onProgress,
-    void Function(String?)? onTimeEstimate,
+    void Function(Duration?)? onTimeEstimate,
   }) async {
     // Simulate processing sequence
     for (int i = 0; i < state.length; i++) {
-      // Notify progress to trigger scroll logic in UI
-      onProgress(i, state.length, 0.1, state[i].fileName);
+      final task = state[i];
+
+      // 1. Trigger Scroll: Update current processing index
+      ref.read(currentProcessingIndexProvider.notifier).state = i;
       
-      // Update state internally so UI widgets (VideoTaskListItem) see the change
+      // 2. Trigger UI Progress: Update the specific provider for this task
+      ref.read(taskProgressProvider(task.id).notifier).state = 0.5;
+
+      // 3. Update internal state (consistency check)
       state = [
         for (final t in state)
-          if (t.id == state[i].id) t.copyWith(progress: 0.1) else t
+          if (t.id == task.id) t.copyWith(progress: 0.5) else t
       ];
 
-      // Wait to allow test to verify scroll
+      // Wait to allow test to verify scroll and UI updates
       await Future.delayed(const Duration(milliseconds: 100));
+      
+      // Clean up progress for this task (simulate completion)
+      ref.read(taskProgressProvider(task.id).notifier).state = 1.0;
     }
     // Keep processing state active for verification so the UI doesn't switch to Results view
     await Future.delayed(const Duration(seconds: 5));
@@ -71,9 +96,6 @@ class TestSaveDirNotifier extends SaveDirNotifier {
   TestSaveDirNotifier() : super() {
     state = const AsyncValue.data('/tmp');
   }
-
-  @override
-  Future<void> _initialize() async {}
 }
 
 void main() {
@@ -107,9 +129,12 @@ void main() {
 
              // Override tasksProvider
              tasksProvider.overrideWith((ref) {
+               // Pasamos 'ref' correctamente al constructor del mock
                final controller = TestTasksController(ref);
                // Inject initial data manually
-               for(var t in tasks) controller.addTask(t);
+               for (var t in tasks) {
+                 controller.addTask(t);
+               }
                return controller;
              }),
           ],
@@ -126,26 +151,24 @@ void main() {
         ),
       );
       
-      // Wait for async init
+      // Wait for async init and microtask in ProcessPage
       await tester.pump(); 
-      await tester.pump(const Duration(milliseconds: 100)); // Start processing
+      await tester.pump(const Duration(milliseconds: 100)); // Start processing loop
 
       // Verify initial state: Item 0 is visible
       expect(find.text('video_0.mp4'), findsOneWidget);
       // Item 29 should be off-screen (assumes 30 items don't fit in default test viewport)
-      // Standard test screen is 800x600. 30 items * ~80 height = 2400 > 600.
       expect(find.text('video_29.mp4'), findsNothing);
 
       // Advance time step by step to allow frames to pump and scroll logic to execute
-      // This ensures addPostFrameCallback callbacks (triggered by onProgress) actually run
-      for (int i = 0; i < 40; i++) { // 40 * 100ms = 4 seconds
+      for (int i = 0; i < 40; i++) { 
         await tester.pump(const Duration(milliseconds: 100));
       }
       
-      // Wait for scroll animation (500ms in code)
+      // Final settle to ensure scroll animation completes
       await tester.pumpAndSettle();
 
-      // Verify item 29 is now visible
+      // Verify item 29 is now visible (auto-scroll worked)
       expect(find.text('video_29.mp4'), findsOneWidget);
 
       // Advance time to allow the "keep alive" timer in TestTasksController to finish

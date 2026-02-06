@@ -556,5 +556,40 @@
   "uriResolutionFailed": "No se pudo obtener la ruta original, se usará ruta temporal",
   "@uriResolutionFailed": {
     "description": "Advertencia cuando falla la resolución de URI"
+  },
+
+  "resolutionScale": "Resolución de salida: {percentage}%",
+  "@resolutionScale": {
+    "description": "Etiqueta para el slider de resolución con porcentaje",
+    "placeholders": {
+      "percentage": {
+        "type": "int"
+      }
+    }
+  },
+
+  "scale10Percent": "10%",
+  "@scale10Percent": {
+    "description": "Etiqueta para marca de escala 10%"
+  },
+
+  "scaleOriginal": "Original",
+  "@scaleOriginal": {
+    "description": "Etiqueta para marca de escala Original"
+  },
+
+  "hardwareAccelerationAvailable": "Aceleración por hardware disponible",
+  "@hardwareAccelerationAvailable": {
+    "description": "Tooltip para códecs acelerados por hardware"
+  },
+
+  "timeRemaining": "{time} restantes",
+  "@timeRemaining": {
+    "description": "Mensaje de tiempo restante",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   }
 }

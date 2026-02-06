@@ -30,6 +30,9 @@ class AppSpacing {
   /// Extra large: 32dp - Espaciado máximo
   static const double xl = 32.0;
 
+  /// Double extra large: 48dp - Espaciado hero/display
+  static const double xxl = 48.0;
+
   const AppSpacing._();
 }
 
@@ -64,6 +67,15 @@ class AppIconSize {
   /// Large: 24dp - Iconos default M3 (acciones principales)
   static const double l = 24.0;
 
+  /// Extra large: 32dp - Iconos grandes
+  static const double xl = 32.0;
+
+  /// Double extra large: 48dp - Iconos hero
+  static const double xxl = 48.0;
+
+  /// Triple extra large: 64dp - Iconos display (empty states)
+  static const double xxxl = 64.0;
+
   const AppIconSize._();
 }
 
@@ -83,6 +95,9 @@ class AppPadding {
 
   /// Extra large: 32dp all sides
   static const EdgeInsets xl = EdgeInsets.all(AppSpacing.xl);
+
+  /// Double extra large: 48dp all sides
+  static const EdgeInsets xxl = EdgeInsets.all(AppSpacing.xxl);
 
   const AppPadding._();
 }

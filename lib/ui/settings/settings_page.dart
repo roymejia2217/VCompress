@@ -6,7 +6,6 @@ import 'package:vcompressor/ui/widgets/app_app_bar.dart';
 import 'package:vcompressor/ui/widgets/app_icons.dart';
 import 'package:vcompressor/core/constants/app_design_tokens.dart' as tokens;
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:vcompressor/ui/widgets/app_spacing.dart';
 import 'package:vcompressor/l10n/app_localizations.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -95,7 +94,7 @@ class SettingsPage extends ConsumerWidget {
             ),
           ),
 
-          const AppSpacing(AppSpacingSize.l),
+          const SizedBox(height: tokens.AppSpacing.l),
 
           // Sección de Idioma - Material 3 Pattern con Card
           Card(
@@ -154,7 +153,7 @@ class SettingsPage extends ConsumerWidget {
             ),
           ),
 
-          const AppSpacing(AppSpacingSize.l),
+          const SizedBox(height: tokens.AppSpacing.l),
 
           // Sección de Almacenamiento - Material 3 Pattern con Card Outlined
           Card(

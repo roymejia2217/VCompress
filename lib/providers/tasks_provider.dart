@@ -36,6 +36,10 @@ final taskByIdProvider = Provider.family<VideoTask?, String>((ref, taskId) {
   }
 });
 
+/// Provider que indica el índice de la tarea que se está procesando actualmente.
+/// Usado por la UI para actualizar títulos y scroll sin re-renderizar toda la lista.
+final currentProcessingIndexProvider = StateProvider<int>((ref) => 0);
+
 class TasksController extends StateNotifier<List<VideoTask>> {
   final Ref _ref;
 
@@ -232,18 +236,13 @@ class TasksController extends StateNotifier<List<VideoTask>> {
 
   Future<void> compressAll({
     required String saveDir,
-    required void Function(
-      int currentIndex,
-      int total,
-      double percent,
-      String currentFileName,
-    )
-    onProgress,
-    void Function(String?)? onTimeEstimate,
+    void Function(Duration?)? onTimeEstimate,
   }) async {
     try {
       // Resetea flag de cancelación global
       _isGlobalCancelled = false;
+      // Resetea índice de procesamiento
+      _ref.read(currentProcessingIndexProvider.notifier).state = 0;
 
       if (state.isEmpty) {
         AppLogger.warning(
@@ -285,6 +284,9 @@ class TasksController extends StateNotifier<List<VideoTask>> {
           break;
         }
 
+        // Actualizar provider de índice actual para la UI
+        _ref.read(currentProcessingIndexProvider.notifier).state = i;
+
         // Obtener estado actual de la tarea (puede haber cambiado por UI)
         var task = state[i];
 
@@ -307,9 +309,6 @@ class TasksController extends StateNotifier<List<VideoTask>> {
           task.settings,
         );
 
-        // Notificar progreso global inicial (para AppBar subtitle)
-        onProgress(i, state.length, 0.0, task.fileName);
-
         // PERFORMANCE FIX: 
         // Actualizamos el estado del Task UNA VEZ a 'Processing' (progress > 0).
         // Los updates subsiguientes (0.02, 0.03...) van al `taskProgressProvider` 
@@ -327,9 +326,6 @@ class TasksController extends StateNotifier<List<VideoTask>> {
           // Actualizar SOLO el provider de progreso, NO el estado de la lista.
           // Esto evita notifyListeners() masivos.
           _ref.read(taskProgressProvider(task.id).notifier).state = percent;
-
-          // Notificar progreso global para AppBar (solo actualiza el contador si cambia index)
-          onProgress(i, state.length, percent, fileName);
         }, onTimeEstimate: onTimeEstimate);
 
         // Verificar estado post-ejecución

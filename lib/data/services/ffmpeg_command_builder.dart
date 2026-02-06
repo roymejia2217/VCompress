@@ -18,7 +18,20 @@ class FFmpegCommandBuilder {
     HardwareCapabilities hwCapabilities, {
     bool forceSoftware = false,
   }) async {
-    final args = <String>['-y'];
+    final args = <String>[];
+
+    // Optimización de Logs (Memoria y Performance)
+    // Reducir logs innecesarios para evitar overhead en el buffer de FFmpegKit
+    // Solo mostramos 'info' en debug, 'warning' en release.
+    args.add('-hide_banner');
+    if (kDebugMode) {
+      args.addAll(['-loglevel', 'info']);
+    } else {
+      args.addAll(['-loglevel', 'warning']);
+    }
+
+    // Sobreescribir archivo de salida si existe
+    args.add('-y');
 
     // Agregar aceleración por hardware si está disponible y no se fuerza software
     if (!forceSoftware &&

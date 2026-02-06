@@ -99,7 +99,7 @@ class SaveDirNotifier extends StateNotifier<AsyncValue<String>> {
 
     try {
       final result = _directoryPicker != null 
-          ? await _directoryPicker!() 
+          ? await _directoryPicker() 
           : await FilePicker.platform.getDirectoryPath();
 
       if (result == null || result.isEmpty) {

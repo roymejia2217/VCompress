@@ -556,5 +556,40 @@
   "uriResolutionFailed": "Could not get original path, temporary path will be used",
   "@uriResolutionFailed": {
     "description": "Warning when URI resolution fails"
+  },
+
+  "resolutionScale": "Output resolution: {percentage}%",
+  "@resolutionScale": {
+    "description": "Label for resolution slider with percentage",
+    "placeholders": {
+      "percentage": {
+        "type": "int"
+      }
+    }
+  },
+
+  "scale10Percent": "10%",
+  "@scale10Percent": {
+    "description": "Label for 10% scale mark"
+  },
+
+  "scaleOriginal": "Original",
+  "@scaleOriginal": {
+    "description": "Label for Original scale mark"
+  },
+
+  "hardwareAccelerationAvailable": "Hardware Acceleration Available",
+  "@hardwareAccelerationAvailable": {
+    "description": "Tooltip for hardware accelerated codecs"
+  },
+
+  "timeRemaining": "{time} remaining",
+  "@timeRemaining": {
+    "description": "Time remaining message",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   }
 }

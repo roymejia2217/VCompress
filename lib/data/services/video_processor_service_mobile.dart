@@ -36,7 +36,7 @@ class VideoProcessorServiceMobile implements VideoProcessorService {
     required VideoTask task,
     required String outputPath,
     required void Function(double) onProgress,
-    required void Function(String?) onTimeEstimate,
+    required void Function(Duration?) onTimeEstimate,
     bool useTemporaryFile = false,
   }) async {
     try {
@@ -139,7 +139,7 @@ class VideoProcessorServiceMobile implements VideoProcessorService {
     List<String> args,
     VideoTask task,
     void Function(double) onProgress,
-    void Function(String?) onTimeEstimate,
+    void Function(Duration?) onTimeEstimate,
   ) async {
     try {
       final cmd = args.join(' ');
@@ -304,7 +304,7 @@ class VideoProcessorServiceMobile implements VideoProcessorService {
   Future<Result<void, AppError>> _waitForSessionCompletion(
     dynamic session,
     void Function(double) onProgress,
-    void Function(String?) onTimeEstimate,
+    void Function(Duration?) onTimeEstimate,
   ) async {
     while (true) {
       final returnCode = await session.getReturnCode();

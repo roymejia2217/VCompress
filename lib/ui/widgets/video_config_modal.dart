@@ -67,14 +67,14 @@ class VideoConfigModal extends ConsumerWidget {
               // Slider de Escala (Sustituye a Resolución fija)
               _buildScaleSlider(context, ref),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.m),
               
               // Grupo: Opciones básicas de salida
               _buildAudioToggle(context, ref),
               const SizedBox(height: AppSpacing.s),
               _buildReplaceOriginalToggle(context, ref),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.m),
 
               // ═══ NIVEL 2: AVANZADO (20% usuarios) ═══
               _buildAdvancedExpansion(context, ref),
@@ -168,7 +168,7 @@ class VideoConfigModal extends ConsumerWidget {
               // "Resolución (Escala)" o similar. Usamos string hardcoded por falta de key,
               // pero idealmente deberíamos agregar 'resolutionScale' al ARB.
               // Usamos 'outputResolution' existente para mantener compatibilidad.
-              "${AppLocalizations.of(context)!.outputResolution}: $percentage%",
+              AppLocalizations.of(context)!.resolutionScale(percentage),
               style: theme.textTheme.titleSmall,
             ),
             if (task != null && task!.videoWidth != null && task!.videoHeight != null)
@@ -199,8 +199,8 @@ class VideoConfigModal extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("10%", style: theme.textTheme.labelSmall),
-              Text("Original", style: theme.textTheme.labelSmall),
+              Text(AppLocalizations.of(context)!.scale10Percent, style: theme.textTheme.labelSmall),
+              Text(AppLocalizations.of(context)!.scaleOriginal, style: theme.textTheme.labelSmall),
             ],
           ),
         ),
@@ -286,13 +286,13 @@ class VideoConfigModal extends ConsumerWidget {
                               const SizedBox(width: 4),
                               Icon(
                                 PhosphorIcons.lightning(), 
-                                size: 14, 
+                                size: AppIconSize.s, 
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                             ],
                           ],
                         ),
-                        tooltip: isHwSupported ? 'Hardware Acceleration Available' : null,
+                        tooltip: isHwSupported ? AppLocalizations.of(context)!.hardwareAccelerationAvailable : null,
                       );
                     }).toList(),
                     selected: {codec == VideoCodec.auto ? VideoCodec.h264 : codec},

@@ -42,32 +42,33 @@ class AppLocalizationsIt extends AppLocalizations {
   String get storage => 'Archiviazione';
 
   @override
-  String get loadingSettings => 'Cargando configuración...';
+  String get loadingSettings => 'Caricamento impostazioni...';
 
   @override
-  String get errorLoadingSettings => 'Error al cargar configuración';
+  String get errorLoadingSettings =>
+      'Errore durante il caricamento delle impostazioni';
 
   @override
-  String get retry => 'Reintentar';
+  String get retry => 'Riprova';
 
   @override
   String saveFolderSemantics(String path) {
-    return 'Carpeta de guardado configurada como $path';
+    return 'Cartella di salvataggio impostata su $path';
   }
 
   @override
-  String get changeFolderSemantics => 'Cambiar carpeta de guardado';
+  String get changeFolderSemantics => 'Cambia cartella di salvataggio';
 
   @override
-  String get changeFolderHint => 'Activa para seleccionar nueva carpeta';
+  String get changeFolderHint => 'Attiva per selezionare una nuova cartella';
 
   @override
   String invalidFilesCount(int count) {
-    return 'Archivos no válidos: $count';
+    return 'File non validi: $count';
   }
 
   @override
-  String get view => 'Ver';
+  String get view => 'Vedi';
 
   @override
   String get light => 'Chiaro';
@@ -396,4 +397,24 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get uriResolutionFailed =>
       'Impossibile ottenere il percorso originale, verrà utilizzato un percorso temporaneo';
+
+  @override
+  String resolutionScale(int percentage) {
+    return 'Risoluzione di output: $percentage%';
+  }
+
+  @override
+  String get scale10Percent => '10%';
+
+  @override
+  String get scaleOriginal => 'Originale';
+
+  @override
+  String get hardwareAccelerationAvailable =>
+      'Accelerazione hardware disponibile';
+
+  @override
+  String timeRemaining(String time) {
+    return '$time rimanenti';
+  }
 }

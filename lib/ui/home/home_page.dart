@@ -21,6 +21,7 @@ import 'package:vcompressor/ui/widgets/batch_config_decision_modal.dart';
 
 import 'package:vcompressor/ui/widgets/video_config_modal.dart';
 import 'package:vcompressor/core/constants/app_design_tokens.dart';
+import 'package:vcompressor/core/constants/app_animations.dart';
 import 'package:vcompressor/models/models.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -90,7 +91,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             width: 200,
             child: LinearProgressIndicator(
               value: progressValue,
-              minHeight: 4,
+              minHeight: AppSpacing.xs,
               backgroundColor: colorScheme.surfaceContainerHighest,
               color: colorScheme.primary,
             ),
@@ -121,7 +122,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         children: [
           AppIcon(
             icon: PhosphorIconsFill.video,
-            config: const AppIconConfig(size: 64),
+            config: const AppIconConfig(size: AppIconSize.xxxl),
             color: theme.colorScheme.outline,
           ),
           const SizedBox(height: AppSpacing.m),
@@ -395,12 +396,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         children: [
           loadingState.isAddingVideos
               ? const SizedBox(
-                  width: 20,
-                  height: 20,
+                  width: AppIconSize.m,
+                  height: AppIconSize.m,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(PhosphorIconsFill.filePlus),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.s),
           Text(
             loadingState.isAddingVideos
                 ? _getProcessingText(context)
@@ -499,7 +500,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           children: [
             Expanded(
               child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
+                duration: AppAnimations.medium2,
                 transitionBuilder: (child, animation) {
                   return ScaleTransition(
                     scale: animation,

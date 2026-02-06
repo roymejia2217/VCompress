@@ -38,7 +38,6 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         
-        // ✅ Optimización: Solo ARM64 para maximizar reducción de tamaño (ARMv7 menos del 3% en 2025)
         ndk {
             abiFilters.addAll(listOf("arm64-v8a"))
         }
@@ -89,4 +88,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }

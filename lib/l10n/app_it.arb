@@ -46,9 +46,64 @@
     "description": "Nome della lingua francese"
   },
   
+  "italian": "Italiano",
+  "@italian": {
+    "description": "Nome della lingua italiana"
+  },
+  
   "storage": "Archiviazione",
   "@storage": {
     "description": "Titolo della sezione archiviazione"
+  },
+  
+  "loadingSettings": "Caricamento impostazioni...",
+  "@loadingSettings": {
+    "description": "Messaggio mostrato durante il caricamento delle impostazioni"
+  },
+  
+  "errorLoadingSettings": "Errore durante il caricamento delle impostazioni",
+  "@errorLoadingSettings": {
+    "description": "Messaggio di errore quando il caricamento delle impostazioni fallisce"
+  },
+  
+  "retry": "Riprova",
+  "@retry": {
+    "description": "Testo del pulsante riprova"
+  },
+  
+  "saveFolderSemantics": "Cartella di salvataggio impostata su {path}",
+  "@saveFolderSemantics": {
+    "description": "Etichetta semantica per la cartella di salvataggio",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "changeFolderSemantics": "Cambia cartella di salvataggio",
+  "@changeFolderSemantics": {
+    "description": "Etichetta semantica per il pulsante di cambio cartella"
+  },
+  
+  "changeFolderHint": "Attiva per selezionare una nuova cartella",
+  "@changeFolderHint": {
+    "description": "Suggerimento semantico per il pulsante di cambio cartella"
+  },
+  
+  "invalidFilesCount": "File non validi: {count}",
+  "@invalidFilesCount": {
+    "description": "Messaggio che mostra il numero di file non validi",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "view": "Vedi",
+  "@view": {
+    "description": "Testo del pulsante per vedere i dettagli"
   },
   
   "light": "Chiaro",
@@ -501,5 +556,40 @@
   "uriResolutionFailed": "Impossibile ottenere il percorso originale, verrà utilizzato un percorso temporaneo",
   "@uriResolutionFailed": {
     "description": "Avvertimento quando la risoluzione URI fallisce"
+  },
+
+  "resolutionScale": "Risoluzione di output: {percentage}%",
+  "@resolutionScale": {
+    "description": "Etichetta per il cursore di risoluzione con percentuale",
+    "placeholders": {
+      "percentage": {
+        "type": "int"
+      }
+    }
+  },
+
+  "scale10Percent": "10%",
+  "@scale10Percent": {
+    "description": "Etichetta per segno di scala 10%"
+  },
+
+  "scaleOriginal": "Originale",
+  "@scaleOriginal": {
+    "description": "Etichetta per segno di scala Originale"
+  },
+
+  "hardwareAccelerationAvailable": "Accelerazione hardware disponibile",
+  "@hardwareAccelerationAvailable": {
+    "description": "Tooltip per codec accelerati via hardware"
+  },
+
+  "timeRemaining": "{time} rimanenti",
+  "@timeRemaining": {
+    "description": "Messaggio di tempo rimanente",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   }
 }

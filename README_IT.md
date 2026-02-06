@@ -137,68 +137,48 @@ Miniature:               Video Thumbnail 0.5.6
 
 ```
 lib/
-├── core/                              # Logica principale dell'applicazione
-│   ├── constants/
-│   │   ├── app_constants.dart        # Costanti globali
-│   │   └── app_design_tokens.dart    # Spaziatura M3, padding, colori
-│   ├── error/
-│   │   └── app_error.dart            # Gestione centralizzata degli errori
-│   ├── performance/
-│   │   └── memory_manager.dart       # Tracciamento e ottimizzazione della memoria
-│   └── result/
-│       └── result.dart               # Tipo Result<T, E> generico
+├── core/                              # Architettura e utilità principali
+│   ├── accessibility/                # Aiuti per l'accessibilità
+│   ├── constants/                    # Costanti, token di design, animazioni
+│   ├── error/                        # Gestione e definizioni degli errori
+│   ├── extensions/                   # Estensioni Dart
+│   ├── hardware/                     # Logica di rilevamento hardware
+│   ├── logging/                      # Utilità di logging
+│   ├── performance/                  # Gestione della memoria
+│   ├── result/                       # Pattern di tipo Result
+│   ├── services/                     # Servizi principali
+│   └── validation/                   # Logica di validazione
 │
-├── data/                              # Layer di dati e servizi
-│   ├── repositories/                 # Repository di dati
-│   └── services/                     # 15 servizi specializzati
+├── data/                              # Livello dati
+│   ├── repositories/                 # Implementazioni dei repository
+│   └── services/                     # Servizi dati (FFmpeg, MediaStore, ecc.)
 │
-├── domain/                            # Logica di business e use case
-│   └── usecases/
-│       └── add_video_files_usecase.dart
+├── domain/                            # Livello di dominio (Logica di Business)
+│   ├── models/                       # Modelli di dominio
+│   ├── repositories/                 # Interfacce dei repository
+│   └── usecases/                     # Casi d'uso dell'applicazione
 │
-├── models/                            # Modelli di dati
-│   ├── video_task.dart               # Task di compressione video
-│   ├── video_settings.dart           # Impostazioni di compressione
-│   ├── hardware_info.dart            # Capacità del dispositivo
-│   └── compression_result.dart       # Risultati dell'elaborazione
+├── l10n/                              # File di localizzazione (.arb)
 │
-├── providers/                         # Gestione dello stato Riverpod (8 provider)
-│   ├── batch_config_provider.dart    # Configurazione elaborazione batch
-│   ├── error_handler_provider.dart   # Gestione globale degli errori
-│   ├── hardware_provider.dart        # Capacità del dispositivo
-│   ├── loading_provider.dart         # Stati di caricamento e progressione
-│   ├── settings_provider.dart        # Preferenze utente
-│   ├── tasks_provider.dart           # Gestione della coda di task
-│   ├── video_config_provider.dart    # Configurazione compressione individuale
-│   └── video_services_provider.dart  # Provider di servizi
+├── models/                            # Modelli di dati condivisi
 │
-├── router/                            # Configurazione navigazione
-│   └── app_router.dart               # Configurazione GoRouter
+├── providers/                         # Gestione dello stato (Riverpod)
 │
-├── theme/                             # Temi Material 3
-│   └── app_theme.dart                # Configurazione tema (chiaro/scuro)
+├── router/                            # Configurazione della navigazione
 │
-├── ui/                                # Interfaccia utente
-│   ├── hardware/                     # Visualizzazione informazioni hardware
-│   ├── home/                         # Pagina principale
-│   ├── process/                      # Pagina elaborazione video
-│   ├── settings/                     # Impostazioni e preferenze
-│   ├── theme/                        # Utilità tema
-│   ├── video/                        # Widget correlati a video
-│   └── widgets/                      # Componenti riutilizzabili
+├── services/                          # Servizi globali (Permessi)
 │
-├── utils/                             # Funzioni di utilità
-│   └── cache_service.dart            # Servizio di cache in memoria e su disco
+├── ui/                                # Interfaccia Utente (Widget e Pagine)
+│   ├── home/                         # Schermata principale
+│   ├── process/                      # Schermata di elaborazione
+│   ├── settings/                     # Schermata impostazioni
+│   ├── theme/                        # Configurazione del tema
+│   └── widgets/                      # Widget riutilizzabili
 │
-├── l10n/                              # Localizzazione
-│   ├── app_localizations.dart        # Localizzazioni generate
-│   ├── app_es.arb                    # Traduzioni spagnole
-│   ├── app_en.arb                    # Traduzioni inglesi
-│   ├── app_fr.arb                    # Traduzioni francesi
-│   └── app_it.arb                    # Traduzioni italiane
+└── utils/                             # Utilità generali
 │
-├── l10n.yaml                         # Configurazione localizzazione
-└── main.dart                         # Punto di ingresso dell'applicazione
+└── main.dart                          # Punto di ingresso dell'applicazione
+```
 
 android/                               # Configurazione specifica Android
 ├── app/src/main/

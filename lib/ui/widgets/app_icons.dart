@@ -156,10 +156,10 @@ class AppIconConfig {
   const AppIconConfig.small() : size = AppIconSize.s, usePrimaryColor = false;
   const AppIconConfig.medium() : size = AppIconSize.m, usePrimaryColor = false;
   const AppIconConfig.large() : size = AppIconSize.l, usePrimaryColor = false;
-  const AppIconConfig.extraLarge() : size = 32, usePrimaryColor = false;
+  const AppIconConfig.extraLarge() : size = AppIconSize.xl, usePrimaryColor = false;
 
   // Configs para casos específicos
-  const AppIconConfig.successProcess() : size = 64, usePrimaryColor = false;
+  const AppIconConfig.successProcess() : size = AppIconSize.xxxl, usePrimaryColor = false;
 
   const AppIconConfig.primary() : size = AppIconSize.m, usePrimaryColor = true;
 }

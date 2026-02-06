@@ -396,4 +396,24 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get uriResolutionFailed =>
       'No se pudo obtener la ruta original, se usará ruta temporal';
+
+  @override
+  String resolutionScale(int percentage) {
+    return 'Resolución de salida: $percentage%';
+  }
+
+  @override
+  String get scale10Percent => '10%';
+
+  @override
+  String get scaleOriginal => 'Original';
+
+  @override
+  String get hardwareAccelerationAvailable =>
+      'Aceleración por hardware disponible';
+
+  @override
+  String timeRemaining(String time) {
+    return '$time restantes';
+  }
 }

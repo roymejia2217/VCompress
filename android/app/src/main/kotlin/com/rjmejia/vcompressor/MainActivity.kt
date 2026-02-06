@@ -1,6 +1,7 @@
 package com.rjmejia.vcompressor
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.content.Context
 import android.media.MediaCodecList
 import android.media.MediaScannerConnection
@@ -9,6 +10,10 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -18,41 +23,49 @@ class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.rjmejia.vcompressor/hardware_detection"
     private val SCAN_CHANNEL = "com.rjmejia.vcompressor/media_scan"
 
+    // Scope for background tasks (IO/CPU intensive)
+    private val ioScope = CoroutineScope(Dispatchers.IO)
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         
-        // CRÍTICO: Registrar todos los plugins manualmente para release builds
-        GeneratedPluginRegistrant.registerWith(flutterEngine)
-        
-        // Registrar plugins nativos
+        // Native plugin registration
         flutterEngine.plugins.add(com.rjmejia.vcompressor.plugins.MediaStoreUriResolverPlugin())
         flutterEngine.plugins.add(com.rjmejia.vcompressor.plugins.FileReplacementPlugin())
         
-        // Canal de detección de hardware
+        // Hardware Detection Channel
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "getHardwareInfo" -> {
-                    try {
-                        val hardwareInfo = getHardwareInfo()
-                        result.success(hardwareInfo)
-                    } catch (e: Exception) {
-                        result.error("HARDWARE_DETECTION_ERROR", e.message, null)
+                    ioScope.launch {
+                        try {
+                            val info = getHardwareInfoSafety()
+                            withContext(Dispatchers.Main) {
+                                result.success(info)
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                result.error("HARDWARE_DETECTION_ERROR", e.message, null)
+                            }
+                        }
                     }
                 }
                 "getSupportedCodecs" -> {
-                    try {
-                        val codecs = getSupportedCodecs()
-                        result.success(codecs)
-                    } catch (e: Exception) {
-                        result.error("CODEC_DETECTION_ERROR", e.message, null)
+                    ioScope.launch {
+                        try {
+                            val codecs = getSupportedCodecsSafety()
+                            withContext(Dispatchers.Main) {
+                                result.success(codecs)
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                result.error("CODEC_DETECTION_ERROR", e.message, null)
+                            }
+                        }
                     }
                 }
                 "getAndroidVersion" -> {
-                    try {
-                        result.success(Build.VERSION.SDK_INT)
-                    } catch (e: Exception) {
-                        result.error("VERSION_ERROR", e.message, null)
-                    }
+                    result.success(Build.VERSION.SDK_INT)
                 }
                 else -> {
                     result.notImplemented()
@@ -60,14 +73,13 @@ class MainActivity : FlutterActivity() {
             }
         }
 
-        // Canal de escaneo de medios
+        // Media Scan Channel (Lightweight, can run on main thread wrapper but actual scan is async)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SCAN_CHANNEL).setMethodCallHandler { call, result ->
             if (call.method == "scanFile") {
                 val path = call.argument<String>("path")
                 if (path != null) {
-                    MediaScannerConnection.scanFile(this, arrayOf(path), null) { _, uri ->
-                        // Escaneo completado
-                    }
+                    // MediaScannerConnection.scanFile is already async internally
+                    MediaScannerConnection.scanFile(this, arrayOf(path), null) { _, _ -> }
                     result.success(null)
                 } else {
                     result.error("INVALID_PATH", "Path cannot be null", null)
@@ -79,32 +91,30 @@ class MainActivity : FlutterActivity() {
     }
 
     @SuppressLint("HardwareIds")
-    private fun getHardwareInfo(): Map<String, Any> {
+    private fun getHardwareInfoSafety(): Map<String, Any> {
         val info = mutableMapOf<String, Any>()
         
-        // Información básica del dispositivo
-        info["manufacturer"] = Build.MANUFACTURER
-        info["model"] = Build.MODEL
-        info["brand"] = Build.BRAND
-        info["product"] = Build.PRODUCT
-        info["device"] = Build.DEVICE
-        info["board"] = Build.BOARD
-        info["hardware"] = Build.HARDWARE
+        // Basic Device Info
+        info["manufacturer"] = Build.MANUFACTURER ?: "Unknown"
+        info["model"] = Build.MODEL ?: "Unknown"
+        info["brand"] = Build.BRAND ?: "Unknown"
+        info["product"] = Build.PRODUCT ?: "Unknown"
+        info["device"] = Build.DEVICE ?: "Unknown"
+        info["board"] = Build.BOARD ?: "Unknown"
+        info["hardware"] = Build.HARDWARE ?: "Unknown"
         
-        // Información del procesador
+        // CPU Info
         info["cpuCores"] = Runtime.getRuntime().availableProcessors()
         info["cpuArchitecture"] = System.getProperty("os.arch") ?: "unknown"
         
-        // Detectar tipo de procesador
-        val processorType = detectProcessorType()
-        info["processorType"] = processorType
+        // Processor Type (SoC) - Improved Logic
+        info["processorType"] = detectProcessorType()
         
-        // Información de GPU
-        val gpuInfo = detectGPUInfo()
-        info["gpuInfo"] = gpuInfo
+        // GPU Info - Best Effort
+        info["gpuInfo"] = detectGPUInfo()
         
-        // Información de memoria
-        val memoryInfo = getMemoryInfo()
+        // Memory Info - CORRECTED to use ActivityManager
+        val memoryInfo = getRealMemoryInfo()
         info["totalMemory"] = memoryInfo["total"] ?: 0L
         info["availableMemory"] = memoryInfo["available"] ?: 0L
         
@@ -112,61 +122,81 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun detectProcessorType(): String {
+        // 1. Try Android 12+ SoC API
+        if (Build.VERSION.SDK_INT >= 31) {
+            val soc = Build.SOC_MANUFACTURER
+            if (!soc.isNullOrEmpty() && soc != "unknown") {
+                 val model = Build.SOC_MODEL ?: ""
+                 return "$soc $model".trim()
+            }
+        }
+
+        // 2. Fallback: Parse /proc/cpuinfo (Legacy)
         val cpuInfo = getCPUInfo()
-        
+        if (cpuInfo.isNotEmpty()) {
+            return when {
+                cpuInfo.contains("exynos", ignoreCase = true) -> "Samsung Exynos"
+                cpuInfo.contains("snapdragon", ignoreCase = true) || 
+                cpuInfo.contains("qualcomm", ignoreCase = true) -> "Qualcomm Snapdragon"
+                cpuInfo.contains("mediatek", ignoreCase = true) || 
+                cpuInfo.contains("mtk", ignoreCase = true) -> "MediaTek"
+                cpuInfo.contains("unisoc", ignoreCase = true) || 
+                cpuInfo.contains("spreadtrum", ignoreCase = true) -> "Unisoc"
+                cpuInfo.contains("kirin", ignoreCase = true) || 
+                cpuInfo.contains("hisilicon", ignoreCase = true) -> "HiSilicon Kirin"
+                cpuInfo.contains("tensor", ignoreCase = true) ||
+                cpuInfo.contains("google", ignoreCase = true) -> "Google Tensor"
+                else -> "Unknown (Generic)"
+            }
+        }
+
+        // 3. Fallback: Build.HARDWARE
+        val hardware = Build.HARDWARE.lowercase()
         return when {
-            cpuInfo.contains("exynos", ignoreCase = true) -> "exynos"
-            cpuInfo.contains("snapdragon", ignoreCase = true) || 
-            cpuInfo.contains("qualcomm", ignoreCase = true) -> "snapdragon"
-            cpuInfo.contains("mediatek", ignoreCase = true) || 
-            cpuInfo.contains("mtk", ignoreCase = true) -> "mediatek"
-            cpuInfo.contains("unisoc", ignoreCase = true) || 
-            cpuInfo.contains("spreadtrum", ignoreCase = true) -> "unisoc"
-            else -> "unknown"
+            hardware.contains("exynos") -> "Samsung Exynos"
+            hardware.contains("qcom") || hardware.contains("msm") -> "Qualcomm Snapdragon"
+            hardware.contains("mt") -> "MediaTek"
+            hardware.contains("kirin") -> "HiSilicon Kirin"
+            else -> hardware
         }
     }
 
     private fun getCPUInfo(): String {
         return try {
-            val reader = BufferedReader(FileReader("/proc/cpuinfo"))
-            val cpuInfo = StringBuilder()
-            var line: String?
+            val file = File("/proc/cpuinfo")
+            if (!file.exists() || !file.canRead()) return ""
             
-            while (reader.readLine().also { line = it } != null) {
-                if (line?.startsWith("Hardware") == true || 
-                    line?.startsWith("model name") == true ||
-                    line?.startsWith("Processor") == true) {
-                    cpuInfo.append(line).append("\n")
+            BufferedReader(FileReader(file)).use { reader ->
+                var line: String?
+                val sb = StringBuilder()
+                while (reader.readLine().also { line = it } != null) {
+                    if (line?.contains("Hardware", ignoreCase = true) == true || 
+                        line?.contains("model name", ignoreCase = true) == true ||
+                        line?.contains("Processor", ignoreCase = true) == true) {
+                        sb.append(line).append("\n")
+                    }
                 }
+                sb.toString()
             }
-            reader.close()
-            cpuInfo.toString()
-        } catch (e: IOException) {
-            "unknown"
+        } catch (e: Exception) {
+            ""
         }
     }
 
     private fun detectGPUInfo(): String {
-        return try {
-            // Intentar obtener información de GPU desde archivos del sistema
-            val gpuInfo = getGPUFromSystemFiles()
-            if (gpuInfo.isNotEmpty()) {
-                return gpuInfo
-            }
+        // 1. Try reading system files (Legacy/Root)
+        val gpuFromFiles = getGPUFromSystemFiles()
+        if (gpuFromFiles.isNotEmpty()) return gpuFromFiles
 
-            // Fallback: usar información del hardware (detectar familia genérica)
-            val hardware = Build.HARDWARE.lowercase()
-            val board = Build.BOARD.lowercase()
-
-            when {
-                hardware.contains("exynos") || board.contains("exynos") -> "Mali (Exynos)"
-                hardware.contains("snapdragon") || board.contains("snapdragon") -> "Adreno (Snapdragon)"
-                hardware.contains("mediatek") || board.contains("mediatek") -> "Mali (MediaTek)"
-                hardware.contains("unisoc") || board.contains("unisoc") -> "Mali (UniSoC)"
-                else -> "Unknown GPU"
-            }
-        } catch (e: Exception) {
-            "Unknown GPU"
+        // 2. Fallback: Infer from Chipset/Board
+        val hardware = (Build.HARDWARE + " " + Build.BOARD).lowercase()
+        return when {
+            hardware.contains("exynos") -> "Mali (Exynos)"
+            hardware.contains("snapdragon") || hardware.contains("qcom") -> "Adreno (Snapdragon)"
+            hardware.contains("mediatek") || hardware.contains("mt") -> "Mali/PowerVR (MediaTek)"
+            hardware.contains("unisoc") || hardware.contains("spreadtrum") -> "Mali/PowerVR (Unisoc)"
+            hardware.contains("kirin") -> "Mali (Kirin)"
+            else -> "Unknown GPU"
         }
     }
 
@@ -180,34 +210,38 @@ class MainActivity : FlutterActivity() {
         for (filePath in gpuFiles) {
             try {
                 val file = File(filePath)
-                if (file.exists()) {
-                    val reader = BufferedReader(FileReader(file))
-                    val content = reader.readText().trim()
-                    reader.close()
-                    if (content.isNotEmpty()) {
-                        return content
-                    }
+                if (file.exists() && file.canRead()) {
+                    val content = file.readText().trim()
+                    if (content.isNotEmpty()) return content
                 }
             } catch (e: Exception) {
-                // Continuar con el siguiente archivo
+                // Ignore and try next
             }
         }
         return ""
     }
 
-    private fun getMemoryInfo(): Map<String, Long> {
-        val runtime = Runtime.getRuntime()
-        val totalMemory = runtime.totalMemory()
-        val freeMemory = runtime.freeMemory()
-        val availableMemory = freeMemory + (runtime.maxMemory() - totalMemory)
-        
-        return mapOf(
-            "total" to totalMemory,
-            "available" to availableMemory
-        )
+    private fun getRealMemoryInfo(): Map<String, Long> {
+        return try {
+            val actManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val memInfo = ActivityManager.MemoryInfo()
+            actManager.getMemoryInfo(memInfo)
+            
+            mapOf(
+                "total" to memInfo.totalMem,
+                "available" to memInfo.availMem
+            )
+        } catch (e: Exception) {
+            // Fallback to Runtime (incorrect but better than crash)
+            val runtime = Runtime.getRuntime()
+            mapOf(
+                "total" to runtime.totalMemory(),
+                "available" to runtime.freeMemory()
+            )
+        }
     }
 
-    private fun getSupportedCodecs(): Map<String, Any> {
+    private fun getSupportedCodecsSafety(): Map<String, Any> {
         val codecs = mutableMapOf<String, Any>()
         
         try {
@@ -245,7 +279,7 @@ class MainActivity : FlutterActivity() {
             codecs["hasH265HwEncoder"] = h265Encoders.isNotEmpty()
             
         } catch (e: Exception) {
-            // Fallback a valores por defecto
+            // Return empty if failure
             codecs["h264Encoders"] = emptyList<String>()
             codecs["h265Encoders"] = emptyList<String>()
             codecs["h264Decoders"] = emptyList<String>()

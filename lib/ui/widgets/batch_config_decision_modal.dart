@@ -19,11 +19,11 @@ class BatchConfigDecisionModal extends ConsumerWidget {
     // Migrado: Usar constantes estáticas en lugar de AppThemeVars deprecated
 
     return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        top: 16,
-        right: 16,
-        bottom: MediaQuery.of(context).padding.bottom + 16,
+      padding: EdgeInsets.fromLTRB(
+        tokens.AppSpacing.m,
+        tokens.AppSpacing.m,
+        tokens.AppSpacing.m,
+        MediaQuery.of(context).padding.bottom + tokens.AppSpacing.m,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

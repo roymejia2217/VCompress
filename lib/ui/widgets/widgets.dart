@@ -1,6 +1,5 @@
 // Widgets principales
 export 'app_app_bar.dart';
-export 'app_spacing.dart';
 
 // Widgets específicos
 export 'app_video_player.dart';

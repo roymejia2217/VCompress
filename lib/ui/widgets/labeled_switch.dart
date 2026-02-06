@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vcompressor/core/constants/app_spacing.dart';
+import 'package:vcompressor/core/constants/app_design_tokens.dart';
 
 /// Widget helper reutilizable para Switch con label siguiendo Material 3
 ///

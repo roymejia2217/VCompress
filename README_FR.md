@@ -137,87 +137,47 @@ Miniatures:          Video Thumbnail 0.5.6
 
 ```
 lib/
-├── core/                              # Logique principale de l'application
-│   ├── constants/
-│   │   ├── app_constants.dart        # Constantes globales
-│   │   └── app_design_tokens.dart    # Espacement M3, remplissage, couleurs
-│   ├── error/
-│   │   └── app_error.dart            # Gestion centralisée des erreurs
-│   ├── performance/
-│   │   └── memory_manager.dart       # Suivi et optimisation de la mémoire
-│   └── result/
-│       └── result.dart               # Type Result<T, E> générique
+├── core/                              # Architecture et utilitaires du noyau
+│   ├── accessibility/                # Aides à l'accessibilité
+│   ├── constants/                    # Constantes, jetons de design, animations
+│   ├── error/                        # Gestion et définitions des erreurs
+│   ├── extensions/                   # Extensions Dart
+│   ├── hardware/                     # Logique de détection matérielle
+│   ├── logging/                      # Utilitaires de journalisation
+│   ├── performance/                  # Gestion de la mémoire
+│   ├── result/                       # Modèle de type Result
+│   ├── services/                     # Services du noyau
+│   └── validation/                   # Logique de validation
 │
-├── data/                              # Couche de données et services
-│   ├── repositories/                 # Référentiels de données
-│   └── services/                     # 15 services spécialisés
+├── data/                              # Couche de données
+│   ├── repositories/                 # Implémentations des dépôts
+│   └── services/                     # Services de données (FFmpeg, MediaStore, etc.)
 │
-├── domain/                            # Logique métier et cas d'utilisation
-│   └── usecases/
-│       └── add_video_files_usecase.dart
+├── domain/                            # Couche de domaine (Logique Métier)
+│   ├── models/                       # Modèles de domaine
+│   ├── repositories/                 # Interfaces des dépôts
+│   └── usecases/                     # Cas d'utilisation de l'application
 │
-├── models/                            # Modèles de données
-│   ├── video_task.dart               # Tâche de compression vidéo
-│   ├── video_settings.dart           # Paramètres de compression
-│   ├── hardware_info.dart            # Capacités du périphérique
-│   └── compression_result.dart       # Résultats du traitement
+├── l10n/                              # Fichiers de localisation (.arb)
 │
-├── providers/                         # Gestion d'état Riverpod (8 fournisseurs)
-│   ├── batch_config_provider.dart    # Configuration du traitement par lot
-│   ├── error_handler_provider.dart   # Gestion globale des erreurs
-│   ├── hardware_provider.dart        # Capacités du périphérique
-│   ├── loading_provider.dart         # États de chargement et progression
-│   ├── settings_provider.dart        # Préférences utilisateur
-│   ├── tasks_provider.dart           # Gestion de la file d'attente des tâches
-│   ├── video_config_provider.dart    # Configuration de compression individuelle
-│   └── video_services_provider.dart  # Fournisseurs de services
+├── models/                            # Modèles de données partagés
 │
-├── router/                            # Configuration de navigation
-│   └── app_router.dart               # Configuration de GoRouter
+├── providers/                         # Gestion d'état (Riverpod)
 │
-├── theme/                             # Thèmes Material 3
-│   └── app_theme.dart                # Configuration de thème (clair/sombre)
+├── router/                            # Configuration de la navigation
 │
-├── ui/                                # Interface utilisateur
-│   ├── hardware/                     # Affichage des informations matériel
-│   ├── home/                         # Page principale
-│   ├── process/                      # Page de traitement vidéo
-│   ├── settings/                     # Paramètres et préférences
-│   ├── theme/                        # Utilitaires de thème
-│   ├── video/                        # Widgets liés à la vidéo
-│   └── widgets/                      # Composants réutilisables
+├── services/                          # Services globaux (Permissions)
 │
-├── utils/                             # Fonctions utilitaires
-│   └── cache_service.dart            # Service de cache en mémoire et sur disque
+├── ui/                                # Interface Utilisateur (Widgets et Pages)
+│   ├── home/                         # Écran d'accueil
+│   ├── process/                      # Écran de traitement
+│   ├── settings/                     # Écran des paramètres
+│   ├── theme/                        # Configuration du thème
+│   └── widgets/                      # Widgets réutilisables
 │
-├── l10n/                              # Localisation
-│   ├── app_localizations.dart        # Localisations générées
-│   ├── app_es.arb                    # Traductions espagnoles
-│   ├── app_en.arb                    # Traductions anglaises
-│   └── app_fr.arb                    # Traductions françaises
+└── utils/                             # Utilitaires généraux
 │
-├── l10n.yaml                         # Configuration de localisation
-└── main.dart                         # Point d'entrée de l'application
-
-android/                               # Configuration spécifique Android
-├── app/src/main/
-│   ├── AndroidManifest.xml           # Manifeste Android
-│   ├── java/                         # Code source Java
-│   ├── kotlin/                       # Code source Kotlin
-│   └── res/
-│       ├── mipmap-*/                 # Icônes d'application
-│       ├── values/                   # Chaînes, couleurs, thèmes
-│       └── play_store_512.png        # Icône Play Store
-│
-├── build.gradle                      # Gradle au niveau du projet
-└── settings.gradle                   # Paramètres Gradle
-
-test/                                  # Suite de tests (5 catégories)
-├── accessibility/                    # Tests d'accessibilité
-├── integration/                      # Tests d'intégration
-├── performance/                      # Tests de performance
-├── unit/                             # Tests unitaires
-└── widget/                           # Tests de widgets
+└── main.dart                          # Point d'entrée de l'application
 ```
 
 ### Services Clés Expliqués

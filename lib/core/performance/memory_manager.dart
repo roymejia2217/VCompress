@@ -19,8 +19,7 @@ class MemoryManager {
   // Configuración
   static const int _maxCacheSize = 100; // Máximo número de elementos en cache
   static const Duration _defaultCacheTimeout = Duration(minutes: 30);
-  // static const int _maxMemoryUsageMB = 100; // Unused field // Máximo uso de memoria en MB
-
+  
   // Monitoreo
   Timer? _cleanupTimer;
   bool _isEnabled = true;
@@ -35,7 +34,9 @@ class MemoryManager {
     // Iniciar timer de limpieza periódica
     _startCleanupTimer();
 
-    debugPrint('[MEMORY] MemoryManager inicializado');
+    if (kDebugMode) {
+      debugPrint('[MEMORY] MemoryManager inicializado');
+    }
   }
 
   /// Almacena un recurso en cache
@@ -59,7 +60,9 @@ class MemoryManager {
       removeFromCache(key);
     });
 
-    debugPrint('[CACHE] Recurso cacheado: $key');
+    if (kDebugMode) {
+      debugPrint('[CACHE] Recurso cacheado: $key');
+    }
   }
 
   /// Obtiene un recurso del cache
@@ -70,7 +73,9 @@ class MemoryManager {
     if (resource != null && resource is R) {
       // Actualizar timestamp de acceso
       _cacheTimestamps[key] = DateTime.now();
-      debugPrint('[READ] Recurso recuperado del cache: $key');
+      if (kDebugMode) {
+        debugPrint('[READ] Recurso recuperado del cache: $key');
+      }
       return resource;
     }
 
@@ -94,7 +99,9 @@ class MemoryManager {
     // Liberar recursos si es necesario
     _disposeResource(resource);
 
-    debugPrint('[DELETE] Recurso removido del cache: $key');
+    if (kDebugMode) {
+      debugPrint('[DELETE] Recurso removido del cache: $key');
+    }
   }
 
   /// Limpia todo el cache
@@ -116,7 +123,9 @@ class MemoryManager {
     _cacheTimestamps.clear();
     _cacheTimers.clear();
 
-    debugPrint('[CLEANUP] Cache completamente limpiado');
+    if (kDebugMode) {
+      debugPrint('[CLEANUP] Cache completamente limpiado');
+    }
   }
 
   /// Obtiene estadísticas del cache
@@ -137,35 +146,55 @@ class MemoryManager {
     };
   }
 
-  /// Limpia archivos temporales
+  /// Limpia archivos temporales de manera asíncrona y no bloqueante
+  /// CRITICAL FIX: Reemplazo de listSync() por Stream para evitar congelamiento de UI
   Future<void> cleanupTempFiles() async {
     if (!_isEnabled) return;
 
     try {
       final tempDir = await getTemporaryDirectory();
-      final files = tempDir.listSync();
+      
+      // Verificación defensiva de existencia
+      if (!await tempDir.exists()) return;
 
       int deletedCount = 0;
       final now = DateTime.now();
+      
+      // CRITICAL FIX: Uso de Stream (list) en lugar de listSync
+      // Esto permite que el Event Loop procese otros eventos entre iteraciones
+      await for (final entity in tempDir.list(recursive: false, followLinks: false)) {
+        if (entity is File) {
+          try {
+            // Obtener stats asíncronamente
+            final stat = await entity.stat();
+            final age = now.difference(stat.modified);
 
-      for (final file in files) {
-        if (file is File) {
-          final stat = await file.stat();
-          final age = now.difference(stat.modified);
-
-          // Eliminar archivos más antiguos de 1 hora
-          if (age.inHours > 1) {
-            await file.delete();
-            deletedCount++;
+            // Eliminar archivos más antiguos de 1 hora
+            if (age.inHours > 1) {
+              // Verificación doble por si otro proceso lo borró
+              if (await entity.exists()) {
+                await entity.delete();
+                deletedCount++;
+              }
+            }
+          } catch (e) {
+            // Manejo de errores granular: Si falla un archivo (ej. locked),
+            // no abortar todo el proceso.
+            if (kDebugMode) {
+              debugPrint('[MEMORY] Error ignorado limpiando archivo ${entity.path}: $e');
+            }
           }
         }
       }
 
-      debugPrint(
-        '[FILES] Archivos temporales limpiados: $deletedCount eliminados',
-      );
+      if (deletedCount > 0 && kDebugMode) {
+        debugPrint(
+          '[FILES] Archivos temporales limpiados: $deletedCount eliminados',
+        );
+      }
     } catch (e) {
-      debugPrint('[ERROR] Error limpiando archivos temporales: $e');
+      // Error general en el directorio (ej. permisos)
+      debugPrint('[ERROR] Error crítico limpiando archivos temporales: $e');
     }
   }
 
@@ -176,13 +205,15 @@ class MemoryManager {
     // Limpiar cache antiguo
     await _cleanupOldCache();
 
-    // Limpiar archivos temporales
+    // Limpiar archivos temporales (Ahora Safe-Async)
     await cleanupTempFiles();
 
     // Forzar garbage collection si es posible
     _forceGarbageCollection();
 
-    debugPrint('[OPTIMIZE] Optimización de memoria completada');
+    if (kDebugMode) {
+      debugPrint('[OPTIMIZE] Optimización de memoria completada');
+    }
   }
 
   /// Habilita o deshabilita el gestor
@@ -200,7 +231,9 @@ class MemoryManager {
   void dispose() {
     _stopCleanupTimer();
     clearCache();
-    debugPrint('[MEMORY] MemoryManager disposed');
+    if (kDebugMode) {
+      debugPrint('[MEMORY] MemoryManager disposed');
+    }
   }
 
   /// Inicia timer de limpieza periódica
@@ -224,6 +257,7 @@ class MemoryManager {
     final now = DateTime.now();
     final keysToRemove = <String>[];
 
+    // Iteración síncrona segura (in-memory, <100 items)
     for (final entry in _cacheTimestamps.entries) {
       final age = now.difference(entry.value);
       if (age > _defaultCacheTimeout) {
@@ -235,7 +269,7 @@ class MemoryManager {
       removeFromCache(key);
     }
 
-    if (keysToRemove.isNotEmpty) {
+    if (keysToRemove.isNotEmpty && kDebugMode) {
       debugPrint(
         '[CLEANUP] Cache antiguo limpiado: ${keysToRemove.length} elementos',
       );
@@ -258,7 +292,9 @@ class MemoryManager {
 
     if (oldestKey != null) {
       removeFromCache(oldestKey);
-      debugPrint('Elemento más antiguo expulsado del cache: $oldestKey');
+      if (kDebugMode) {
+        debugPrint('Elemento más antiguo expulsado del cache: $oldestKey');
+      }
     }
   }
 
@@ -277,9 +313,16 @@ class MemoryManager {
       } else if (resource is Map || resource is List) {
         // Limpiar colecciones grandes
         resource.clear();
+      } else if (resource is ChangeNotifier) {
+        // Soporte para Notifiers
+        try {
+          resource.dispose();
+        } catch (_) {} 
       }
     } catch (e) {
-      debugPrint('[WARNING] Error liberando recurso: $e');
+      if (kDebugMode) {
+        debugPrint('[WARNING] Error liberando recurso: $e');
+      }
     }
   }
 
@@ -287,7 +330,7 @@ class MemoryManager {
   void _forceGarbageCollection() {
     if (kDebugMode) {
       // En modo debug, podemos intentar forzar la limpieza de memoria
-      debugPrint('Forzando garbage collection...');
+      // debugPrint('Forzando garbage collection...');
     }
   }
 }
@@ -310,6 +353,7 @@ mixin MemoryManagedMixin<T extends StatefulWidget> on State<T> {
 
   /// Cachea un recurso con el contexto del widget
   void cacheResource(String key, dynamic resource, {Duration? timeout}) {
+    if (!mounted) return;
     final fullKey = '${widget.runtimeType}_$key';
     MemoryManager().cacheResource(fullKey, resource, timeout: timeout);
     _cachedResources.add(fullKey);
@@ -371,6 +415,7 @@ class _MemoryManagedWidgetState extends State<MemoryManagedWidget>
   @override
   void dispose() {
     // Optimizar memoria al destruir el widget
+    // Esto ahora es seguro y no bloqueará la UI gracias al fix en cleanupTempFiles
     MemoryManager().optimizeMemory();
     super.dispose();
   }

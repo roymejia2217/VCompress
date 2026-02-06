@@ -46,9 +46,64 @@
     "description": "Nom de la langue française"
   },
   
+  "italian": "Italien",
+  "@italian": {
+    "description": "Nom de la langue italienne"
+  },
+  
   "storage": "Stockage",
   "@storage": {
     "description": "Titre de la section stockage"
+  },
+  
+  "loadingSettings": "Chargement des paramètres...",
+  "@loadingSettings": {
+    "description": "Message montré pendant le chargement de la configuration"
+  },
+  
+  "errorLoadingSettings": "Erreur lors du chargement des paramètres",
+  "@errorLoadingSettings": {
+    "description": "Message d'erreur quand le chargement de la configuration échoue"
+  },
+  
+  "retry": "Réessayer",
+  "@retry": {
+    "description": "Texte du bouton réessayer"
+  },
+  
+  "saveFolderSemantics": "Dossier de sauvegarde défini sur {path}",
+  "@saveFolderSemantics": {
+    "description": "Étiquette sémantique pour le dossier de sauvegarde",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "changeFolderSemantics": "Changer le dossier de sauvegarde",
+  "@changeFolderSemantics": {
+    "description": "Étiquette sémantique pour le bouton de changement de dossier"
+  },
+  
+  "changeFolderHint": "Activer pour sélectionner un nouveau dossier",
+  "@changeFolderHint": {
+    "description": "Indice sémantique pour le bouton de changement de dossier"
+  },
+  
+  "invalidFilesCount": "Fichiers invalides : {count}",
+  "@invalidFilesCount": {
+    "description": "Message montrant le nombre de fichiers invalides",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "view": "Voir",
+  "@view": {
+    "description": "Texte du bouton pour voir les détails"
   },
   
   "light": "Clair",
@@ -501,5 +556,40 @@
   "uriResolutionFailed": "Impossible d'obtenir le chemin d'accès d'origine, le chemin temporaire sera utilisé",
   "@uriResolutionFailed": {
     "description": "Avertissement quand la résolution d'URI échoue"
+  },
+
+  "resolutionScale": "Résolution de sortie : {percentage}%",
+  "@resolutionScale": {
+    "description": "Étiquette pour le curseur de résolution avec pourcentage",
+    "placeholders": {
+      "percentage": {
+        "type": "int"
+      }
+    }
+  },
+
+  "scale10Percent": "10 %",
+  "@scale10Percent": {
+    "description": "Étiquette pour marque d'échelle 10%"
+  },
+
+  "scaleOriginal": "Original",
+  "@scaleOriginal": {
+    "description": "Étiquette pour marque d'échelle Original"
+  },
+
+  "hardwareAccelerationAvailable": "Accélération matérielle disponible",
+  "@hardwareAccelerationAvailable": {
+    "description": "Tooltip pour codecs accélérés par matériel"
+  },
+
+  "timeRemaining": "{time} restants",
+  "@timeRemaining": {
+    "description": "Message de temps restant",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   }
 }

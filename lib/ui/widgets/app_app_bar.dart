@@ -15,6 +15,7 @@ import 'package:vcompressor/core/constants/app_design_tokens.dart';
 class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String? subtitle;
+  final Widget? subtitleWidget; // Widget opcional para subtítulo dinámico
   final List<Widget>? actions;
   final Widget? leading;
   final Color? backgroundColor;
@@ -28,6 +29,7 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.title,
     this.subtitle,
+    this.subtitleWidget,
     this.actions,
     this.leading,
     this.backgroundColor,
@@ -50,25 +52,23 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.subtitle,
     this.actions,
   }) : leading = null,
+       subtitleWidget = null,
        backgroundColor = null,
        centerTitle = false,
        automaticallyImplyLeading = false, // SIN botón back
-       titleSpacing = 16.0,
+       titleSpacing = AppSpacing.m,
        backIcon = null,
        onBackPressed = null;
 
   /// Factory para páginas con botón de regresar (Settings, Process, etc.)
   /// ICONO CONSTANTE: PhosphorIconsRegular.arrowUUpLeft (flecha diagonal)
   /// USO básico: AppAppBar.withReturn(title: 'Configuración', subtitle: '...')
-  /// USO con acción custom: AppAppBar.withReturn(
-  ///   title: 'Comprimiendo',
-  ///   subtitle: 'Video 1 de 3',
-  ///   onBackPressed: () => _cancel(), // Acción personalizada
-  /// )
+  /// USO dinámico: AppAppBar.withReturn(title: '...', subtitleWidget: ValueListenableBuilder(...))
   const AppAppBar.withReturn({
     super.key,
     required this.title,
     this.subtitle,
+    this.subtitleWidget,
     this.actions,
     this.onBackPressed, // Acción opcional (default: Navigator.pop)
   }) : leading = null,
@@ -97,6 +97,8 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
                 tooltip: 'Volver',
               )
             : null);
+            
+    final hasSubtitle = subtitle != null || subtitleWidget != null;
 
     return AppBar(
       backgroundColor: effectiveBackgroundColor,
@@ -105,11 +107,11 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: actions,
       automaticallyImplyLeading: automaticallyImplyLeading,
       titleSpacing: titleSpacing,
-      toolbarHeight: subtitle != null ? 80 : kToolbarHeight,
+      toolbarHeight: hasSubtitle ? 80.0 : kToolbarHeight,
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
       // Align: centra vertical, mantiene alineación horizontal izquierda
-      title: subtitle != null
+      title: hasSubtitle
           ? Align(
               alignment: Alignment.centerLeft,
               child: _buildTitleWithSubtitle(context, colorScheme),
@@ -145,7 +147,18 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        if (subtitle != null)
+        if (subtitleWidget != null)
+           Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.xs),
+            child: DefaultTextStyle(
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 12.0,
+              ),
+              child: subtitleWidget!,
+            ),
+           )
+        else if (subtitle != null)
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
@@ -164,6 +177,7 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize {
-    return Size.fromHeight(subtitle != null ? 80 : kToolbarHeight);
+    final hasSubtitle = subtitle != null || subtitleWidget != null;
+    return Size.fromHeight(hasSubtitle ? 80 : kToolbarHeight);
   }
 }

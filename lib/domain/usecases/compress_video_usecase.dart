@@ -43,7 +43,7 @@ class CompressVideoUseCase {
       String currentFileName,
     )
     onProgress, {
-    void Function(String?)? onTimeEstimate,
+    void Function(Duration?)? onTimeEstimate,
   }) async {
     try {
       // Notificar inicio del procesamiento
@@ -140,7 +140,7 @@ class CompressVideoUseCase {
       String currentFileName,
     )
     onProgress, {
-    void Function(String?)? onTimeEstimate,
+    void Function(Duration?)? onTimeEstimate,
   }) async {
     try {
       for (int i = 0; i < tasks.length; i++) {

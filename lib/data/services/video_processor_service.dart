@@ -9,7 +9,7 @@ abstract class VideoProcessorService {
     required VideoTask task,
     required String outputPath,
     required void Function(double) onProgress,
-    required void Function(String?) onTimeEstimate,
+    required void Function(Duration?) onTimeEstimate,
     bool useTemporaryFile = false,
   });
 
