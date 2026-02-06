@@ -178,7 +178,6 @@ lib/
 ├── utils/                             # General utilities
 │
 └── main.dart                          # Application entry point
-```
 
 android/                               # Android-specific configuration
 ├── app/src/main/
